@@ -39,6 +39,10 @@ const configuration: webpack.Configuration = {
   module: {
     rules: [
       {
+        test: /\.js$/,
+        loader: 'unlazy-loader'
+      },
+      {
         test: /\.s?(a|c)ss$/,
         use: [
           MiniCssExtractPlugin.loader,

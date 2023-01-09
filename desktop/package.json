@@ -111,6 +111,7 @@
   "dependencies": {
     "antd": "^5.1.2",
     "axios": "^1.2.2",
+    "babel-preset-es2015": "^6.24.1",
     "boring-avatars": "^1.7.0",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
@@ -126,7 +127,9 @@
     "react-dom": "^18.2.0",
     "react-google-recaptcha-v3": "^1.10.1",
     "react-router-dom": "^6.6.1",
-    "react-toastify": "^9.1.1"
+    "react-toastify": "^9.1.1",
+    "unlazy-loader": "^0.1.3",
+    "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
@@ -157,6 +160,7 @@
     "electron": "^20.0.2",
     "electron-builder": "^23.3.3",
     "electron-devtools-installer": "^3.2.0",
+    "electron-packager": "^17.1.1",
     "electronmon": "^2.0.2",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -199,7 +203,7 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronReact",
+    "productName": "Browser ProFiles",
     "appId": "org.erb.ElectronReact",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
