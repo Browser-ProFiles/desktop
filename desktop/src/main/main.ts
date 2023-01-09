@@ -15,6 +15,8 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { launchBrowser } from './launchBrowser';
+import { isAxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 
 class AppUpdater {
   constructor() {
@@ -33,9 +35,21 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 ipcMain.on('launch-browser', async (event, content) => {
-  const config = JSON.parse(content.options || {});
-  const form = JSON.parse(content.form || {});
-  launchBrowser(content.name, config, form);
+  try {
+    const config = JSON.parse(content.options || {});
+    const form = JSON.parse(content.form || {});
+    await launchBrowser(content.name, config, form);
+    event.reply('browser-launch-finish', {
+      success: true,
+    });
+    // @ts-ignore
+  } catch (e: AxiosError | Error) {
+    console.log('ERR')
+    event.reply('browser-launch-finish', {
+      success: false,
+      error: isAxiosError(e) ? e.response?.data?.message : e.message,
+    });
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -78,8 +92,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 768,
+    height: 500,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       webSecurity: false,

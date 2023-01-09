@@ -1,28 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { List, Button } from 'antd';
+import { List, Button, Spin } from 'antd';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import Avatar from 'boring-avatars';
 import type { AxiosError } from 'axios';
 
-import { fetchProfiles } from '../api';
+import { getInstanceList } from '../api';
 
 const Profiles = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [launching, setLaunching] = useState<boolean>(false);
   const [list, setList] = useState<any[]>([]);
 
   const onLaunch = (config: any) => {
+    setLaunching(true);
     // @ts-ignore
     window.electron.ipcRenderer.sendMessage('launch-browser', config);
   }
 
   useEffect(() => {
+    // @ts-ignore
+    window.electron.ipcRenderer.once('browser-launch-finish', (data: any) => {
+      setLaunching(false);
+      data.success ? toast.success('Profile successfully launched.') : toast.error(data.message);
+    });
+  }, []);
+
+  useEffect(() => {
     const fetch = async () => {
       try {
         setLoading(true);
-        const { data } = await fetchProfiles();
+        const { data } = await getInstanceList();
         setList(data?.profiles);
         // @ts-ignore
       } catch (e: Error | AxiosError) {
@@ -42,24 +53,31 @@ const Profiles = () => {
     };
 
     fetch();
-  }, [fetchProfiles]);
+  }, [getInstanceList]);
 
   return (
-    <div>
-      <h1>Profiles list</h1>
+    <div className="content-inner">
+      <div className="row">
+        <h1 className="title">Profiles</h1>
+        <Spin delay={300} spinning={launching} />
+      </div>
 
       <List
         itemLayout="horizontal"
         dataSource={list}
+        loading={loading}
         renderItem={(item) => (
           <List.Item
             actions={[
-              <Button onClick={() => onLaunch(item)} type="primary">Launch</Button>
+              <Button disabled={launching} onClick={() => onLaunch(item)} type="primary">Launch</Button>
             ]}
           >
             <List.Item.Meta
               title={item.name}
-              description="Empty description"
+              avatar={
+                <Avatar size={45} name={item.name} />
+              }
+              description={item.description || "Empty description"}
             />
           </List.Item>
         )}

@@ -5,9 +5,10 @@ const instance = axios.create({
   baseURL: 'http://localhost:3005/api/v1'
 });
 
-export const login = (username: string, password: string) => instance.post('/auth/sign-in', {
+export const signIn = (username: string, password: string, token: string) => instance.post('/auth/sign-in', {
   username,
   password,
+  token,
 });
 
-export const fetchProfiles = () => instance.get('/instance/list');
+export const getInstanceList = () => instance.get('/instance/list');

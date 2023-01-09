@@ -1,4 +1,44 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.center-page,
 .content {
+  min-height: calc(100vh - 65px - 40px);
+}
+
+.content-inner {
   min-height: calc(100vh - 65px);
+}
+
+.content,
+.content-inner {
   padding: 20px;
+}
+
+.center-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* form */
+
+.ant-form-item {
+  margin-bottom: 8px;
+}
+
+.ant-btn {
+  margin-top: 12px;
+}
+
+/* page */
+
+.title {
+  margin: 0;
+  padding: 0;
+
+  font-size: 24px;
 }
