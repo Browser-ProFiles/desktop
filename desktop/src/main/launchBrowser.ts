@@ -1,19 +1,19 @@
-const puppeteer = require('puppeteer-extra');
-const useProxy = require('puppeteer-page-proxy');
-const { executablePath } = require('puppeteer');
+import path from 'path';
+import os from 'os';
 
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+import puppeteer from 'puppeteer-extra';
+import useProxy from 'puppeteer-page-proxy';
+import { executablePath } from 'puppeteer';
+
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 // const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
-
-const path = require("path");
-const os = require("os");
 
 puppeteer.use(StealthPlugin());
 // puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
-export const launch = async (profileRow: any) => {
+export const launchBrowser = async (name: string, profileRow: any, form: any) => {
   const udd = path.resolve(os.homedir(), 'chrome-browser');
-  const userDataDir = path.resolve(udd, String(profileRow.name || Date.now()));
+  const userDataDir = path.resolve(udd, String(name || Date.now()));
 
   const LAUNCH_OPTIONS = {
     ...profileRow,
@@ -30,16 +30,16 @@ export const launch = async (profileRow: any) => {
   const pages = await browser.pages();
   await pages[0].close();
 
-  if (profileRow.proxyEnabled) {
+  const proxy = form.proxy;
+
+  if (proxy?.proxyEnabled) {
     let proxyUrl: string;
 
-    if (profileRow.proxyAuthEnabled) {
-      proxyUrl = `${profileRow.proxyType}://${profileRow.proxyUsername}:${profileRow.proxyPassword}@${profileRow.proxyHost}:${profileRow.proxyPort}`;
+    if (proxy.proxyAuthEnabled) {
+      proxyUrl = `${proxy.proxyType}://${proxy.proxyUsername}:${proxy.proxyPassword}@${proxy.proxyHost}:${proxy.proxyPort}`;
     } else {
-      proxyUrl = `${profileRow.proxyType}://${profileRow.proxyHost}:${profileRow.proxyPort}`;
+      proxyUrl = `${proxy.proxyType}://${proxy.proxyHost}:${proxy.proxyPort}`;
     }
-
-    console.log('proxyUrl', proxyUrl)
 
     const pages = await browser.pages();
     for (const page of pages) {

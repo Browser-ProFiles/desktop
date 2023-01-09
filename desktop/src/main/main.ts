@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { launchBrowser } from './launchBrowser';
 
 class AppUpdater {
   constructor() {
@@ -29,6 +30,12 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.on('launch-browser', async (event, content) => {
+  const config = JSON.parse(content.options || {});
+  const form = JSON.parse(content.form || {});
+  launchBrowser(content.name, config, form);
 });
 
 if (process.env.NODE_ENV === 'production') {

@@ -5,15 +5,18 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import type { AxiosError } from 'axios';
 
-import { launch } from '../actions/launch';
-
 import { fetchProfiles } from '../api';
 
 const Profiles = () => {
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [list, setList] = useState<any[]>([]);
+
+  const onLaunch = (config: any) => {
+    // @ts-ignore
+    window.electron.ipcRenderer.sendMessage('launch-browser', config);
+  }
 
   useEffect(() => {
     const fetch = async () => {
@@ -51,7 +54,7 @@ const Profiles = () => {
         renderItem={(item) => (
           <List.Item
             actions={[
-              <Button onClick={launch(item)} type="primary">Launch</Button>
+              <Button onClick={() => onLaunch(item)} type="primary">Launch</Button>
             ]}
           >
             <List.Item.Meta
