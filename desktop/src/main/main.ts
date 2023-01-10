@@ -21,10 +21,14 @@ import type { AxiosError } from 'axios';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
+    log.transports.file.resolvePath = () => '/Users/rasularslanov/Desktop/test.log';
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
+
+log.transports.file.level = 'info';
+log.transports.file.resolvePath = () => '/Users/rasularslanov/Desktop/test.log';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -44,11 +48,12 @@ ipcMain.on('launch-browser', async (event, content) => {
     });
     // @ts-ignore
   } catch (e: AxiosError | Error) {
-    console.log('ERR')
     event.reply('browser-launch-finish', {
       success: false,
-      error: isAxiosError(e) ? e.response?.data?.message : e.message,
+      message: isAxiosError(e) ? e.response?.data?.message : e.message,
     });
+    log.log(JSON.stringify(e))
+    console.log('ERR', e)
   }
 });
 
@@ -64,7 +69,7 @@ if (isDebug) {
   require('electron-debug')();
 }
 
-const installExtensions = async () => {
+/*const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
   const extensions = ['REACT_DEVELOPER_TOOLS'];
@@ -75,10 +80,10 @@ const installExtensions = async () => {
       forceDownload
     )
     .catch(console.log);
-};
+};*/
 
 const createWindow = async () => {
-  await installExtensions();
+  // await installExtensions();
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -114,7 +119,7 @@ const createWindow = async () => {
     }
   });
 
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   mainWindow.on('closed', () => {
     mainWindow = null;

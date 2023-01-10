@@ -4,28 +4,31 @@ import os from 'os';
 import puppeteer from 'puppeteer-extra';
 import useProxy from 'puppeteer-page-proxy';
 // @ts-ignore
-import PCR from 'puppeteer-chromium-resolver';
-import { executablePath } from 'puppeteer';
+import chromePaths from 'chrome-paths';
 
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+// import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 // const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 
-puppeteer.use(StealthPlugin());
+// puppeteer.use(StealthPlugin());
 // puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
+
+function getChromiumExecPath() {
+  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked').replace('puppeteer-core', 'puppeteer');
+}
 
 export const launchBrowser = async (name: string, profileRow: any, form: any) => {
   const udd = path.resolve(os.homedir(), 'chrome-browser');
   const userDataDir = path.resolve(udd, String(name || Date.now()));
-  const stats = await PCR();
 
-  console.log('stats.executablePath', stats.executablePath)
+  // console.log('executablePath', chromePaths.chrome)
   const LAUNCH_OPTIONS = {
     ...profileRow,
-    executablePath: stats.executablePath,
+    executablePath: chromePaths.chrome,
     userDataDir: userDataDir,
     // chromePath
   };
 
+  console.log('LAUNCH_OPTIONS', LAUNCH_OPTIONS)
   const browser = await puppeteer.launch(LAUNCH_OPTIONS);
 
   const page = await browser.newPage()
