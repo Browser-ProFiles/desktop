@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Form, Button, Input } from 'antd'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { signIn } from '../api';
+import { setAuthToken } from '../helpers/auth';
 
 interface Form {
   username: string,
@@ -17,26 +17,11 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { executeRecaptcha } = useGoogleReCaptcha();
-
-  const handleReCaptchaVerify = useCallback(async () => {
-    if (!executeRecaptcha) {
-      console.log('Execute recaptcha not yet available');
-      return;
-    }
-    const recTokenResult = await executeRecaptcha('contactForm')
-    setToken(recTokenResult)
-  }, [executeRecaptcha]);
-
-  useEffect(() => {
-    handleReCaptchaVerify();
-  }, [handleReCaptchaVerify]);
-
-  const onSubmit = async (form: Form) => {
+  const onSubmit = (form: Form) => {
     setLoading(true);
-    await handleReCaptchaVerify();
     signIn(form.username, form.password, token || '')
-      .then(() => {
+      .then(({ data }) => {
+        setAuthToken(data.token);
         toast.success('Successfully logged in');
         navigate('/profiles');
       })

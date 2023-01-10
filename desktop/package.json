@@ -113,11 +113,13 @@
     "axios": "^1.2.2",
     "babel-preset-es2015": "^6.24.1",
     "boring-avatars": "^1.7.0",
+    "chrome-paths": "^1.0.1",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^5.2.3",
     "is-electron": "^2.2.1",
     "puppeteer": "^19.4.1",
+    "puppeteer-chromium-resolver": "^19.1.0",
     "puppeteer-core": "^19.4.1",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "file:./stealth-plugin-fix",
@@ -206,7 +208,6 @@
     "productName": "Browser ProFiles",
     "appId": "org.erb.ElectronReact",
     "asar": true,
-    "asarUnpack": "**\\*.{node,dll}",
     "files": [
       "dist",
       "node_modules",
@@ -258,7 +259,8 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      "node_modules/puppeteer"
     ],
     "publish": {
       "provider": "github",

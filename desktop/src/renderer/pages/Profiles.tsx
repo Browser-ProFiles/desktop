@@ -7,6 +7,7 @@ import Avatar from 'boring-avatars';
 import type { AxiosError } from 'axios';
 
 import { getInstanceList } from '../api';
+import { clearAuthToken, isAuth } from '../helpers/auth';
 
 const Profiles = () => {
   const navigate = useNavigate();
@@ -22,6 +23,11 @@ const Profiles = () => {
   }
 
   useEffect(() => {
+    if (!isAuth()) {
+      clearAuthToken();
+      navigate('/auth/login');
+    }
+
     // @ts-ignore
     window.electron.ipcRenderer.once('browser-launch-finish', (data: any) => {
       setLaunching(false);

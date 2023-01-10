@@ -3,6 +3,8 @@ import os from 'os';
 
 import puppeteer from 'puppeteer-extra';
 import useProxy from 'puppeteer-page-proxy';
+// @ts-ignore
+import PCR from 'puppeteer-chromium-resolver';
 import { executablePath } from 'puppeteer';
 
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
@@ -14,10 +16,12 @@ puppeteer.use(StealthPlugin());
 export const launchBrowser = async (name: string, profileRow: any, form: any) => {
   const udd = path.resolve(os.homedir(), 'chrome-browser');
   const userDataDir = path.resolve(udd, String(name || Date.now()));
+  const stats = await PCR();
 
+  console.log('stats.executablePath', stats.executablePath)
   const LAUNCH_OPTIONS = {
     ...profileRow,
-    executablePath: executablePath(),
+    executablePath: stats.executablePath,
     userDataDir: userDataDir,
     // chromePath
   };

@@ -1,6 +1,5 @@
 import { MemoryRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { Layout } from 'antd';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,24 +13,19 @@ const { Footer, Content } = Layout;
 
 export default function App() {
   return (
-    <GoogleReCaptchaProvider
-      reCaptchaKey="6LcyqOIjAAAAAIMycBL4qOO6OHma5Zqcrf10YJLM"
-      language="en"
-    >
-      <Layout>
-        <Content>
-          <Router>
-            <Routes>
-              <Route path="/profiles" element={<Profiles />} />
-              <Route path="/auth/login" element={<Login />} />
-              <Route path="*" element={<Navigate to="/profiles" replace />} />
-            </Routes>
-          </Router>
-        </Content>
-        <Footer>App Name {new Date().getFullYear()} (c)</Footer>
+    <Layout>
+      <Content>
+        <Router>
+          <Routes>
+            <Route path="/profiles" element={<Profiles />} />
+            <Route path="/auth/login" element={<Login />} />
+            <Route path="*" element={<Navigate to="/profiles" replace />} />
+          </Routes>
+        </Router>
+      </Content>
+      <Footer>App Name {new Date().getFullYear()} (c)</Footer>
 
-        <ToastContainer />
-      </Layout>
-    </GoogleReCaptchaProvider>
+      <ToastContainer />
+    </Layout>
   );
 }
