@@ -17,6 +17,6 @@
   "dependencies": {
     "clone-deep": "^4.0.1",
     "merge-deep": "^3.0.3",
-    "puppeteer-extra-plugin-stealth": "file:../../stealth-plugin-fix"
+    "puppeteer-extra-plugin-stealth": "file:../../puppeteer-extra-plugin-stealth"
   }
 }
