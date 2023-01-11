@@ -63,11 +63,13 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
 
     const pages = await browser.pages();
     for (const page of pages) {
+      Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
       await useProxy(page, proxyUrl);
     }
 
     browser.on('targetcreated', async (target: any) => {
       const page = await target.page();
+      Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
       if (!page) return;
 
       await useProxy(page, proxyUrl);
