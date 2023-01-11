@@ -3,8 +3,7 @@ import os from 'os';
 
 import puppeteer from 'puppeteer-extra';
 import useProxy from 'puppeteer-page-proxy';
-// @ts-ignore
-import chromePaths from 'chrome-paths';
+import { executablePath } from "puppeteer";
 
 import ChromeAppPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.app';
 import ChromeCsiPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.csi';
@@ -37,7 +36,7 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
   // console.log('executablePath', chromePaths.chrome)
   const LAUNCH_OPTIONS = {
     ...profileRow,
-    executablePath: chromePaths.chrome,
+    executablePath: executablePath(),
     userDataDir: userDataDir,
     // chromePath
   };
