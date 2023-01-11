@@ -120,7 +120,7 @@
     "puppeteer": "19.5.0",
     "puppeteer-core": "19.5.0",
     "puppeteer-extra": "^3.3.4",
-    "puppeteer-extra-plugin-stealth": "file:./stealth-plugin-fix",
+    "puppeteer-extra-plugin-stealth": "file:./puppeteer-extra-plugin-stealth",
     "puppeteer-in-electron": "^3.0.5",
     "puppeteer-page-proxy": "^1.3.0",
     "react": "^18.2.0",

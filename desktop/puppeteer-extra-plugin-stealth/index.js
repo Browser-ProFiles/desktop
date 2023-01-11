@@ -94,7 +94,7 @@ class StealthPlugin extends PuppeteerExtraPlugin {
       'navigator.webdriver',
       'sourceurl',
       // 'user-agent-override',
-      // 'webgl.vendor',
+      'webgl.vendor',
       'window.outerdimensions'
     ])
     return {

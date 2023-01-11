@@ -6,10 +6,24 @@ import useProxy from 'puppeteer-page-proxy';
 // @ts-ignore
 import chromePaths from 'chrome-paths';
 
-// import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import ChromeAppPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.app';
+import ChromeCsiPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.csi';
+import ChromeLoadPluginsPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.loadTimes';
+import DefaultArgsPlugins from 'puppeteer-extra-plugin-stealth/evasions/defaultArgs';
+import NavigatorPlugins from 'puppeteer-extra-plugin-stealth/evasions/navigator.plugins';
+import NavigatorWebDriverPlugin from 'puppeteer-extra-plugin-stealth/evasions/navigator.webdriver';
+import SourceUrlPlugin from 'puppeteer-extra-plugin-stealth/evasions/sourceurl';
+import WindowOuterDimensionsPlugin from 'puppeteer-extra-plugin-stealth/evasions/window.outerdimensions';
 // const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 
-// puppeteer.use(StealthPlugin());
+puppeteer.use(ChromeAppPlugins());
+puppeteer.use(ChromeCsiPlugins());
+puppeteer.use(ChromeLoadPluginsPlugins());
+puppeteer.use(DefaultArgsPlugins());
+puppeteer.use(NavigatorPlugins());
+puppeteer.use(NavigatorWebDriverPlugin());
+puppeteer.use(SourceUrlPlugin());
+puppeteer.use(WindowOuterDimensionsPlugin());
 // puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 function getChromiumExecPath() {
