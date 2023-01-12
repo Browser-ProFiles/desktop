@@ -1,9 +1,8 @@
 import path from 'path';
-import os from 'os';
-
 import puppeteer from 'puppeteer-extra';
 import useProxy from 'puppeteer-page-proxy';
 import { executablePath } from 'puppeteer';
+import slugify from 'slugify';
 
 import ChromeAppPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.app';
 import ChromeCsiPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.csi';
@@ -13,6 +12,8 @@ import NavigatorPlugins from 'puppeteer-extra-plugin-stealth/evasions/navigator.
 import NavigatorWebDriverPlugin from 'puppeteer-extra-plugin-stealth/evasions/navigator.webdriver';
 import SourceUrlPlugin from 'puppeteer-extra-plugin-stealth/evasions/sourceurl';
 import WindowOuterDimensionsPlugin from 'puppeteer-extra-plugin-stealth/evasions/window.outerdimensions';
+// @ts-ignore
+import UserDataDirPlugin from 'puppeteer-extra-plugin-user-data-dir';
 // const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 
 puppeteer.use(ChromeAppPlugins());
@@ -26,15 +27,15 @@ puppeteer.use(WindowOuterDimensionsPlugin());
 // puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 export const launchBrowser = async (name: string, profileRow: any, form: any) => {
-  const udd = path.resolve(os.homedir(), 'chrome-browser');
-  const userDataDir = path.resolve(udd, String(name || Date.now()));
+  const chromePath = executablePath();
 
-  // console.log('executablePath', chromePaths.chrome)
   const LAUNCH_OPTIONS = {
     ...profileRow,
-    executablePath: executablePath(),
-    userDataDir: userDataDir,
-    // chromePath
+    args: [
+      ...profileRow.args,
+      `--user-data-dir=./${slugify(String(name || Date.now()))}`
+    ],
+    executablePath: chromePath,
   };
 
   console.log('LAUNCH_OPTIONS', LAUNCH_OPTIONS)
@@ -47,6 +48,7 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
   await pages[0].close();
 
   const proxy = form.proxy;
+  const system = form.system;
 
   if (proxy?.proxyEnabled) {
     let proxyUrl: string;
@@ -61,6 +63,7 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     for (const page of pages) {
       Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
       await useProxy(page, proxyUrl);
+      system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
     }
 
     browser.on('targetcreated', async (target: any) => {
@@ -69,6 +72,7 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
       if (!page) return;
 
       await useProxy(page, proxyUrl);
+      system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
     });
   }
 };
