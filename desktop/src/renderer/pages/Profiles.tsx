@@ -16,12 +16,6 @@ const Profiles = () => {
   const [launching, setLaunching] = useState<boolean>(false);
   const [list, setList] = useState<any[]>([]);
 
-  const onLaunch = (config: any) => {
-    setLaunching(true);
-    // @ts-ignore
-    window.electron.ipcRenderer.sendMessage('launch-browser', config);
-  }
-
   useEffect(() => {
     if (!isAuth()) {
       clearAuthToken();
@@ -29,11 +23,17 @@ const Profiles = () => {
     }
 
     // @ts-ignore
-    window.electron.ipcRenderer.once('browser-launch-finish', (data: any) => {
+    window.electron.ipcRenderer.on('browser-launch-finish', (data: any) => {
       setLaunching(false);
       data.success ? toast.success('Profile successfully launched.') : toast.error(data.message);
     });
   }, []);
+
+  const onLaunch = (config: any) => {
+    setLaunching(true);
+    // @ts-ignore
+    window.electron.ipcRenderer.sendMessage('launch-browser', config);
+  }
 
   useEffect(() => {
     const fetch = async () => {
