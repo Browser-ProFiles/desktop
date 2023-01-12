@@ -3,7 +3,7 @@ import os from 'os';
 
 import puppeteer from 'puppeteer-extra';
 import useProxy from 'puppeteer-page-proxy';
-import { executablePath } from "puppeteer";
+import { executablePath } from 'puppeteer';
 
 import ChromeAppPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.app';
 import ChromeCsiPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.csi';
@@ -24,10 +24,6 @@ puppeteer.use(NavigatorWebDriverPlugin());
 puppeteer.use(SourceUrlPlugin());
 puppeteer.use(WindowOuterDimensionsPlugin());
 // puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
-
-function getChromiumExecPath() {
-  return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked').replace('puppeteer-core', 'puppeteer');
-}
 
 export const launchBrowser = async (name: string, profileRow: any, form: any) => {
   const udd = path.resolve(os.homedir(), 'chrome-browser');
