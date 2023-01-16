@@ -10,6 +10,7 @@
   },
   "main": "./dist/main/main.js",
   "scripts": {
+    "install:env": "cross-env PUPPETEER_DOWNLOAD_PATH=./release/app/chromium PUPPETEER_BROWSER_REVISION=1056772 PUPPETEER_CACHE_DIR=./release/app/chromium npm i puppeteer",
     "rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
     "postinstall": "npm run rebuild && npm run link-modules",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"

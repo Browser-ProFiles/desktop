@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const instance = axios.create({
   withCredentials: true,
-  baseURL: 'http://localhost:3005/api/v1',
+  baseURL: 'http://31.31.199.29/api/v1',
   headers: {
     common: {
       Authorization: `Bearer ${localStorage.getItem('authToken')}`

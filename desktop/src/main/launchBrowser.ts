@@ -1,7 +1,7 @@
-import path from 'path';
+import os from 'os';
+import { BrowserFetcher } from "puppeteer";
 import puppeteer from 'puppeteer-extra';
 import useProxy from 'puppeteer-page-proxy';
-import { executablePath } from 'puppeteer';
 import slugify from 'slugify';
 
 import ChromeAppPlugins from 'puppeteer-extra-plugin-stealth/evasions/chrome.app';
@@ -27,15 +27,25 @@ puppeteer.use(WindowOuterDimensionsPlugin());
 // puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 export const launchBrowser = async (name: string, profileRow: any, form: any) => {
-  const chromePath = executablePath();
+  const browserRevision = '1056772';
+  const browserDir = `${os.homedir()}/.browsers`;
+  const browserProfileDir = `${os.homedir()}/.browserprofiles/${slugify(String(name || Date.now()))}`;
+
+  const browserFetcher = new BrowserFetcher({
+    product: 'chrome',
+    path: browserDir,
+  });
+
+  const revisionInfo = await browserFetcher.download(browserRevision) as any;
 
   const LAUNCH_OPTIONS = {
     ...profileRow,
     args: [
       ...profileRow.args,
-      `--user-data-dir=./${slugify(String(name || Date.now()))}`
+      `--user-data-dir=${browserProfileDir}`
     ],
-    executablePath: chromePath,
+    executablePath: revisionInfo.executablePath,
+    timeout: 240000
   };
 
   console.log('LAUNCH_OPTIONS', LAUNCH_OPTIONS)
