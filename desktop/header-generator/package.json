@@ -1,0 +1,46 @@
+{
+    "name": "header-generator",
+    "version": "2.1.7",
+    "description": "NodeJS package for generating realistic browser-like HTTP headers.",
+    "author": {
+        "name": "Apify",
+        "email": "support@apify.com",
+        "url": "https://apify.com"
+    },
+    "homepage": "https://github.com/apify/fingeprint-suite",
+    "license": "Apache-2.0",
+    "engines": {
+        "node": ">=16.0.0"
+    },
+    "main": "index.js",
+    "module": "index.mjs",
+    "types": "index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./index.mjs",
+            "require": "./index.js",
+            "types": "./index.d.ts"
+        }
+    },
+    "dependencies": {
+        "browserslist": "^4.21.1",
+        "generative-bayesian-network": "file:../generative-bayesian-network",
+        "ow": "^0.28.1",
+        "tslib": "^2.4.0"
+    },
+    "scripts": {
+        "build": "npm run clean && npm run compile",
+        "postbuild": "cp -r src/data_files/  && cp ../../README.md ",
+        "clean": "rimraf ./dist",
+        "compile": "tsc -p tsconfig.build.json && gen-esm-wrapper ./index.js ./index.mjs",
+        "copy": "ts-node -T ../../scripts/copy.ts"
+    },
+    "bugs": {
+        "url": "https://github.com/apify/header-generator/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/apify/header-generator.git"
+    },
+    "gitHead": "666759805d4f18d6d307a264280bb1895ef5439e"
+}

@@ -51,7 +51,6 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
       }
     ],
   });
-  console.log('browserFingerprintWithHeaders', browserFingerprintWithHeaders)
 
   const revisionInfo = await browserFetcher.download(browserRevision) as any;
 
@@ -60,11 +59,9 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     args: [
       ...profileRow.args,
       `--user-data-dir=${browserProfileDir}`,
-      `--disable-extensions-except=extensions/webrtc`,
-      `--load-extension=extensions/webrtc`,
     ],
     executablePath: revisionInfo.executablePath,
-    timeout: 240000
+    timeout: 240000 // TODO: Change value
   };
 
   console.log('LAUNCH_OPTIONS', LAUNCH_OPTIONS)

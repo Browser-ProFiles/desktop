@@ -52,15 +52,16 @@ class FingerprintInjector {
         const enhancedFingerprint = this._enhanceFingerprint(fingerprint);
         const { screen, userAgent } = enhancedFingerprint;
         await page.setUserAgent(userAgent);
-        await (await page.target().createCDPSession()).send('Page.setDeviceMetricsOverride', {
+        // TODO (MARK): Commented
+        /*await (await page.target().createCDPSession()).send('Page.setDeviceMetricsOverride', {
             screenHeight: screen.height,
             screenWidth: screen.width,
             width: screen.width,
             height: screen.height,
             mobile: !!(/phone|android|mobile/.test(userAgent)),
-            screenOrientation: screen.height > screen.width ? { angle: 0, type: 'portraitPrimary' } : { angle: 90, type: 'landscapePrimary' },
+            // screenOrientation: screen.height > screen.width ? { angle: 0, type: 'portraitPrimary' } : { angle: 90, type: 'landscapePrimary' },
             deviceScaleFactor: screen.devicePixelRatio,
-        });
+        });*/
         // Override the language properly
         await page.setExtraHTTPHeaders({
             'accept-language': headers['accept-language'],
@@ -85,19 +86,19 @@ class FingerprintInjector {
      */
     getInjectableFingerprintFunction(fingerprint) {
         function inject() {
-            const { battery, navigator: { 
+            const { battery, navigator: {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             extraProperties, userAgentData, webdriver, ...navigatorProps }, screen: allScreenProps, videoCard, historyLength, audioCodecs, videoCodecs,
             // @ts-expect-error internal browser code
              } = fp;
-            const { 
+            const {
             // window screen props
-            outerHeight, outerWidth, devicePixelRatio, innerWidth, innerHeight, screenX, pageXOffset, pageYOffset, 
+            outerHeight, outerWidth, devicePixelRatio, innerWidth, innerHeight, screenX, pageXOffset, pageYOffset,
             // Document screen props
-            clientWidth, clientHeight, 
+            clientWidth, clientHeight,
             // Ignore hdr for now.
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            hasHDR, 
+            hasHDR,
             // window.screen props
             ...newScreen } = allScreenProps;
             const windowScreenProps = {
@@ -124,9 +125,9 @@ class FingerprintInjector {
                 navigatorProps.webdriver = false;
             }
             overrideInstancePrototype(window.navigator, navigatorProps);
-            overrideInstancePrototype(window.screen, newScreen);
-            overrideWindowDimensionsProps(windowScreenProps);
-            overrideDocumentDimensionsProps(documentScreenProps);
+            // overrideInstancePrototype(window.screen, newScreen);
+            // overrideWindowDimensionsProps(windowScreenProps);
+            // overrideDocumentDimensionsProps(documentScreenProps);
             overrideInstancePrototype(window.history, { length: historyLength });
             overrideWebGl(videoCard);
             overrideCodecs(audioCodecs, videoCodecs);
