@@ -42,7 +42,9 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     ...profileRow,
     args: [
       ...profileRow.args,
-      `--user-data-dir=${browserProfileDir}`
+      `--user-data-dir=${browserProfileDir}`,
+      `--disable-extensions-except=extensions/webrtc`,
+      `--load-extension=extensions/webrtc`,
     ],
     executablePath: revisionInfo.executablePath,
     timeout: 240000
@@ -60,29 +62,37 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
   const proxy = form.proxy;
   const system = form.system;
 
+  let proxyUrl: string = '';
   if (proxy?.proxyEnabled) {
-    let proxyUrl: string;
-
     if (proxy.proxyAuthEnabled) {
       proxyUrl = `${proxy.proxyType}://${proxy.proxyUsername}:${proxy.proxyPassword}@${proxy.proxyHost}:${proxy.proxyPort}`;
     } else {
       proxyUrl = `${proxy.proxyType}://${proxy.proxyHost}:${proxy.proxyPort}`;
     }
-
-    const pages = await browser.pages();
-    for (const page of pages) {
-      Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
-      await useProxy(page, proxyUrl);
-      system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
-    }
-
-    browser.on('targetcreated', async (target: any) => {
-      const page = await target.page();
-      Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
-      if (!page) return;
-
-      await useProxy(page, proxyUrl);
-      system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
-    });
   }
+
+  for (const page of pages) {
+    console.log('proxyUrl', proxyUrl)
+    Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
+    proxy?.proxyEnabled && await useProxy(page, proxyUrl);
+
+    try {
+      system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
+    } catch (e) {
+      console.log('emulate timezone error');
+    }
+  }
+
+  browser.on('targetcreated', async (target: any) => {
+    const page = await target.page();
+    if (!page) return;
+
+    Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
+    proxy?.proxyEnabled && await useProxy(page, proxyUrl);
+    try {
+      system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
+    } catch (e) {
+      console.log('emulate timezone error');
+    }
+  });
 };
