@@ -1,6 +1,8 @@
 import os from 'os';
 import { BrowserFetcher } from "puppeteer";
 import puppeteer from 'puppeteer-extra';
+import { FingerprintGenerator } from 'fingerprint-generator';
+import { FingerprintInjector } from 'fingerprint-injector';
 import useProxy from 'puppeteer-page-proxy';
 import slugify from 'slugify';
 
@@ -36,6 +38,21 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     path: browserDir,
   });
 
+  const fingerprintGenerator = new FingerprintGenerator();
+  // TODO: Separate fake fingerprint page
+  const browserFingerprintWithHeaders = fingerprintGenerator.getFingerprint({
+    devices: ['desktop'],
+    operatingSystems: ['macos'],
+    browsers: [
+      {
+        name: 'chrome',
+        minVersion: 108,
+        maxVersion: 108,
+      }
+    ],
+  });
+  console.log('browserFingerprintWithHeaders', browserFingerprintWithHeaders)
+
   const revisionInfo = await browserFetcher.download(browserRevision) as any;
 
   const LAUNCH_OPTIONS = {
@@ -52,6 +69,8 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
 
   console.log('LAUNCH_OPTIONS', LAUNCH_OPTIONS)
   const browser = await puppeteer.launch(LAUNCH_OPTIONS);
+
+  const fingerprintInjector = new FingerprintInjector();
 
   const page = await browser.newPage()
   page.goto('https://google.com');
@@ -72,14 +91,19 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
   }
 
   for (const page of pages) {
-    console.log('proxyUrl', proxyUrl)
     Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
     proxy?.proxyEnabled && await useProxy(page, proxyUrl);
 
     try {
       system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
     } catch (e) {
-      console.log('emulate timezone error');
+      console.log('emulate timezone error (default)');
+    }
+
+    try {
+      await fingerprintInjector.attachFingerprintToPuppeteer(page, browserFingerprintWithHeaders);
+    } catch (e) {
+      console.log('set fingerprint error (default)');
     }
   }
 
@@ -89,10 +113,17 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
 
     Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
     proxy?.proxyEnabled && await useProxy(page, proxyUrl);
+
     try {
       system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
     } catch (e) {
-      console.log('emulate timezone error');
+      console.log('emulate timezone error (new)');
+    }
+
+    try {
+      await fingerprintInjector.attachFingerprintToPuppeteer(page, browserFingerprintWithHeaders);
+    } catch (e) {
+      console.log('set fingerprint error (new)');
     }
   });
 };
