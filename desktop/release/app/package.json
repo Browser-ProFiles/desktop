@@ -19,7 +19,6 @@
     "clone-deep": "^4.0.1",
     "merge-deep": "^3.0.3",
     "puppeteer-extra-plugin-stealth": "file:../../puppeteer-extra-plugin-stealth",
-    "fingerprint-injector": "file:../../fingerprint-injector",
-    "fingerprint-generator": "file:../../fingerprint-generator"
+    "fingerprint-injector": "file:../../fingerprint-injector"
   }
 }

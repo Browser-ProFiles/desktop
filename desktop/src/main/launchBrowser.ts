@@ -1,7 +1,6 @@
 import os from 'os';
 import { BrowserFetcher } from "puppeteer";
 import puppeteer from 'puppeteer-extra';
-import { FingerprintGenerator } from 'fingerprint-generator';
 import { FingerprintInjector } from 'fingerprint-injector';
 import useProxy from 'puppeteer-page-proxy';
 import slugify from 'slugify';
@@ -38,20 +37,6 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     path: browserDir,
   });
 
-  const fingerprintGenerator = new FingerprintGenerator();
-  // TODO: Separate fake fingerprint page
-  const browserFingerprintWithHeaders = fingerprintGenerator.getFingerprint({
-    devices: ['desktop'],
-    operatingSystems: ['macos'],
-    browsers: [
-      {
-        name: 'chrome',
-        minVersion: 108,
-        maxVersion: 108,
-      }
-    ],
-  });
-
   const revisionInfo = await browserFetcher.download(browserRevision) as any;
 
   const LAUNCH_OPTIONS = {
@@ -77,6 +62,7 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
 
   const proxy = form.proxy;
   const system = form.system;
+  const fingerprint = form.fingerprintEnabled ? form.fingerprint : false;
 
   let proxyUrl: string = '';
   if (proxy?.proxyEnabled) {
@@ -97,10 +83,12 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
       console.log('emulate timezone error (default)');
     }
 
-    try {
-      await fingerprintInjector.attachFingerprintToPuppeteer(page, browserFingerprintWithHeaders);
-    } catch (e) {
-      console.log('set fingerprint error (default)');
+    if (fingerprint) {
+      try {
+        await fingerprintInjector.attachFingerprintToPuppeteer(page, fingerprint);
+      } catch (e) {
+        console.log('set fingerprint error (default)');
+      }
     }
   }
 
@@ -117,10 +105,12 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
       console.log('emulate timezone error (new)');
     }
 
-    try {
-      await fingerprintInjector.attachFingerprintToPuppeteer(page, browserFingerprintWithHeaders);
-    } catch (e) {
-      console.log('set fingerprint error (new)');
+    if (fingerprint) {
+      try {
+        await fingerprintInjector.attachFingerprintToPuppeteer(page, fingerprint);
+      } catch (e) {
+        console.log('set fingerprint error (new)');
+      }
     }
   });
 };
