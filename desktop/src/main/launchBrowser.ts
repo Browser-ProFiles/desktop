@@ -62,7 +62,11 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
 
   const proxy = form.proxy;
   const system = form.system;
-  const fingerprint = form.fingerprintEnabled ? form.fingerprint : false;
+  let fingerprint: any = null;
+  if (form.fingerprint?.fingerprintEnabled && form.fingerprint?.fingerprintResult) {
+    fingerprint = JSON.parse(form.fingerprint?.fingerprintResult);
+    fingerprint.headers['accept-language'] = form.system.language.acceptLang ?? 'en';
+  }
 
   let proxyUrl: string = '';
   if (proxy?.proxyEnabled) {
@@ -74,6 +78,7 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
   }
 
   for (const page of pages) {
+    if (!page) return;
     Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
     proxy?.proxyEnabled && await useProxy(page, proxyUrl);
 
@@ -107,9 +112,11 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
 
     if (fingerprint) {
       try {
-        await fingerprintInjector.attachFingerprintToPuppeteer(page, fingerprint);
+        const result = await fingerprintInjector.attachFingerprintToPuppeteer(page, fingerprint);
+        console.warn('FINGERPRINT SET')
+        console.warn('FINGERPRINT SET result', result)
       } catch (e) {
-        console.log('set fingerprint error (new)');
+        console.log('set fingerprint error (new)', e);
       }
     }
   });
