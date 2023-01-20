@@ -45,6 +45,7 @@ ipcMain.on('launch-browser', async (event, content) => {
     await launchBrowser(content.name, config, form);
     event.reply('browser-launch-finish', {
       success: true,
+      name: content.name ?? '',
     });
     // @ts-ignore
   } catch (e: AxiosError | Error) {

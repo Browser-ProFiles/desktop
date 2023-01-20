@@ -25,7 +25,7 @@ const Profiles = () => {
     // @ts-ignore
     window.electron.ipcRenderer.on('browser-launch-finish', (data: any) => {
       setLaunching(false);
-      data.success ? toast.success('Profile successfully launched.') : toast.error(data.message);
+      data.success ? toast.success(`Profile ${data.name ? '"' + data.name + '"' : ''} successfully launched.`) : toast.error(data.message);
     });
   }, []);
 

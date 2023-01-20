@@ -44,6 +44,7 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     args: [
       ...profileRow.args,
       `--user-data-dir=${browserProfileDir}`,
+      // '--host-resolver-rules=MAP example.com 1.1.1.1'
     ],
     executablePath: revisionInfo.executablePath,
     timeout: 240000 // TODO: Change value
@@ -79,6 +80,15 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
 
   for (const page of pages) {
     if (!page) return;
+
+    try {
+      form.fingerprint.hideWebRtcLeak && await page.evaluateOnNewDocument(
+        `navigator.mediaDevices.getUserMedia = navigator.webkitGetUserMedia = navigator.mozGetUserMedia = navigator.getUserMedia = webkitRTCPeerConnection = RTCPeerConnection = MediaStreamTrack = undefined;`
+      );
+    } catch (e) {
+      console.error('webrtc leak hide error (default)');
+    }
+
     Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
     proxy?.proxyEnabled && await useProxy(page, proxyUrl);
 
@@ -101,22 +111,28 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     const page = await target.page();
     if (!page) return;
 
+    try {
+      form.fingerprint.hideWebRtcLeak && await page.evaluateOnNewDocument(
+        `navigator.mediaDevices.getUserMedia = navigator.webkitGetUserMedia = navigator.mozGetUserMedia = navigator.getUserMedia = webkitRTCPeerConnection = RTCPeerConnection = MediaStreamTrack = undefined;`
+      );
+    } catch (e) {
+      console.error('webrtc leak hide error (new)');
+    }
+
     Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
     proxy?.proxyEnabled && await useProxy(page, proxyUrl);
 
     try {
       system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
     } catch (e) {
-      console.log('emulate timezone error (new)');
+      console.error('emulate timezone error (new)');
     }
 
     if (fingerprint) {
       try {
-        const result = await fingerprintInjector.attachFingerprintToPuppeteer(page, fingerprint);
-        console.warn('FINGERPRINT SET')
-        console.warn('FINGERPRINT SET result', result)
+        await fingerprintInjector.attachFingerprintToPuppeteer(page, fingerprint);
       } catch (e) {
-        console.log('set fingerprint error (new)', e);
+        console.error('set fingerprint error (new)', e);
       }
     }
   });
