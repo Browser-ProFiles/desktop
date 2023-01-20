@@ -17,25 +17,25 @@ import { resolveHtmlPath } from './util';
 import { launchBrowser } from './launchBrowser';
 import { isAxiosError } from 'axios';
 import type { AxiosError } from 'axios';
+import os from 'os';
+import slugify from 'slugify';
 
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
-    log.transports.file.resolvePath = () => '/Users/rasularslanov/Desktop/test.log';
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
 log.transports.file.level = 'info';
-log.transports.file.resolvePath = () => '/Users/rasularslanov/Desktop/test.log';
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.on('open-profile', async (event, name) => {
+  const browserProfileDir = `${os.homedir()}/.browserprofiles/${slugify(String(name ?? ''))}`;
+
+  shell.showItemInFolder(browserProfileDir);
 });
 
 ipcMain.on('launch-browser', async (event, content) => {

@@ -29,6 +29,11 @@ const Profiles = () => {
     });
   }, []);
 
+  const onOpenProfile = (name: string) => {
+    // @ts-ignore
+    window.electron.ipcRenderer.sendMessage('open-profile', name);
+  }
+
   const onLaunch = (config: any) => {
     setLaunching(true);
     // @ts-ignore
@@ -75,7 +80,10 @@ const Profiles = () => {
         renderItem={(item) => (
           <List.Item
             actions={[
-              <Button disabled={launching} onClick={() => onLaunch(item)} type="primary">Launch</Button>
+              <React.Fragment>
+                <Button className="buttonLeft" disabled={launching} onClick={() => onOpenProfile(item.name)}>Go to folder</Button>
+                <Button disabled={launching} onClick={() => onLaunch(item)} type="primary">Launch</Button>
+              </React.Fragment>
             ]}
           >
             <List.Item.Meta
