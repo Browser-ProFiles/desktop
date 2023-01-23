@@ -12,6 +12,7 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import dotenv from 'dotenv';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { launchBrowser } from './launchBrowser';
@@ -28,12 +29,16 @@ class AppUpdater {
   }
 }
 
+dotenv.config();
+
+console.log('env', process.env.REACT_APP_API_BASE_URL)
+
 log.transports.file.level = 'info';
 
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('open-profile', async (event, name) => {
-  const browserProfileDir = `${os.homedir()}/.browserprofiles/${slugify(String(name ?? ''))}`;
+  const browserProfileDir = `${os.homedir()}/.browserprofiles/profiles/${slugify(String(name ?? ''))}`;
 
   shell.showItemInFolder(browserProfileDir);
 });
@@ -41,7 +46,7 @@ ipcMain.on('open-profile', async (event, name) => {
 ipcMain.on('launch-browser', async (event, content) => {
   try {
     const config = JSON.parse(content.options || {});
-    const form = JSON.parse(content.form || {});
+    const form = content.form || {};
     await launchBrowser(content.name, config, form);
     event.reply('browser-launch-finish', {
       success: true,
@@ -106,6 +111,10 @@ const createWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
+  // @ts-ignore
+  mainWindow.process = { browser: true, env: {
+      REACT_APP_API_BASE_URL: process.env.REACT_APP_API_BASE_URL,
+  } };
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 

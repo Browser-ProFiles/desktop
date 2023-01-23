@@ -4,6 +4,7 @@
 
 import path from 'path';
 import webpack from 'webpack';
+import dotenv from 'dotenv';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
@@ -118,6 +119,7 @@ const configuration: webpack.Configuration = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: false,
+      ...dotenv.config().parsed,
     }),
 
     new MiniCssExtractPlugin({

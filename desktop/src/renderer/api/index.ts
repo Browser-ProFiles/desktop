@@ -1,8 +1,13 @@
 import axios from 'axios';
 
+if (!process.env.REACT_APP_API_BASE_URL) {
+  console.error('No API URL was given');
+  throw Error('No API URL was given');
+}
+
 const instance = axios.create({
   withCredentials: true,
-  baseURL: 'http://31.31.199.29/api/v1',
+  baseURL: process.env.REACT_APP_API_BASE_URL,
   headers: {
     common: {
       Authorization: `Bearer ${localStorage.getItem('authToken')}`

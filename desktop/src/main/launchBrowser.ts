@@ -29,8 +29,8 @@ puppeteer.use(WindowOuterDimensionsPlugin());
 
 export const launchBrowser = async (name: string, profileRow: any, form: any) => {
   const browserRevision = '1056772';
-  const browserDir = `${os.homedir()}/.browsers`;
-  const browserProfileDir = `${os.homedir()}/.browserprofiles/${slugify(String(name || Date.now()))}`;
+  const browserDir = `${os.homedir()}/.browserprofiles/browsers`;
+  const browserProfileDir = `${os.homedir()}/.browserprofiles/profiles/${slugify(String(name || Date.now()))}`;
 
   const browserFetcher = new BrowserFetcher({
     product: 'chrome',
@@ -65,7 +65,11 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
   const system = form.system;
   let fingerprint: any = null;
   if (form.fingerprint?.fingerprintEnabled && form.fingerprint?.fingerprintResult) {
-    fingerprint = JSON.parse(form.fingerprint?.fingerprintResult);
+    try {
+      fingerprint = JSON.parse(form.fingerprint?.fingerprintResult);
+    } catch (e) {
+      fingerprint = form.fingerprint?.fingerprintResult;
+    }
     fingerprint.headers['accept-language'] = form.system.language.acceptLang ?? 'en';
   }
 

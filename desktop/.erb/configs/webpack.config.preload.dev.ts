@@ -1,5 +1,6 @@
 import path from 'path';
 import webpack from 'webpack';
+import dotenv from 'dotenv';
 import { merge } from 'webpack-merge';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import baseConfig from './webpack.config.base';
@@ -48,6 +49,7 @@ const configuration: webpack.Configuration = {
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
+      ...dotenv.config().parsed,
     }),
 
     new webpack.LoaderOptionsPlugin({

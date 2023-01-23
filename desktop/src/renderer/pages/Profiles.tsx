@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { List, Button, Spin } from 'antd';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import Avatar from 'boring-avatars';
 import type { AxiosError } from 'axios';
 
 import { getInstanceList } from '../api';
@@ -40,30 +39,33 @@ const Profiles = () => {
     window.electron.ipcRenderer.sendMessage('launch-browser', config);
   }
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        setLoading(true);
-        const { data } = await getInstanceList();
-        setList(data?.profiles);
-        // @ts-ignore
-      } catch (e: Error | AxiosError) {
-        console.error(e);
-        if (axios.isAxiosError(e)) {
-          if (e.response?.status === 401 || e.response?.status === 403) {
-            navigate('/auth/login');
-            return;
-          }
-          toast.error(e.response?.data?.message);
-        } else {
-          toast.error(e.message);
+  const fetchInstances = async () => {
+    try {
+      setLoading(true);
+      const { data } = await getInstanceList();
+      setList(data?.profiles.map((profile: any) => ({
+        ...profile,
+        form: profile.form ? JSON.parse(profile.form) : {},
+      })));
+      // @ts-ignore
+    } catch (e: Error | AxiosError) {
+      console.error(e);
+      if (axios.isAxiosError(e)) {
+        if (e.response?.status === 401 || e.response?.status === 403) {
+          navigate('/auth/login');
+          return;
         }
-      } finally {
-        setLoading(false);
+        toast.error(e.response?.data?.message);
+      } else {
+        toast.error(e.message);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetch();
+  useEffect(() => {
+    fetchInstances();
   }, [getInstanceList]);
 
   return (
@@ -71,6 +73,12 @@ const Profiles = () => {
       <div className="row">
         <h1 className="title">Profiles</h1>
         <Spin delay={300} spinning={launching} />
+      </div>
+
+      <div className="row">
+        <Button className="refresh" disabled={launching} onClick={() => fetchInstances()}>
+          Refresh
+        </Button>
       </div>
 
       <List
@@ -88,10 +96,19 @@ const Profiles = () => {
           >
             <List.Item.Meta
               title={item.name}
-              avatar={
-                <Avatar size={45} name={item.name} />
+              description={
+                <React.Fragment>
+                  {item.form.fingerprint?.fingerprintEnabled && (
+                    <div>Generated fingerprint platform: {item.form.fingerprint?.fingerprintOs}</div>
+                  )}
+                  {item.form.system?.timezone?.timezone && (
+                    <div>Timezone: {item.form.system?.timezone?.timezone}</div>
+                  )}
+                  {item.form.proxy?.proxyEnabled && (
+                    <div>Proxy: {item.form.proxy?.proxyHost}:{item.form.proxy?.proxyPort}</div>
+                  )}
+                </React.Fragment>
               }
-              description={item.description || "Empty description"}
             />
           </List.Item>
         )}
