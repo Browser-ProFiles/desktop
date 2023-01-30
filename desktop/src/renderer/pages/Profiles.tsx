@@ -253,11 +253,11 @@ const Profiles = () => {
               title={item.name}
               description={
                 <React.Fragment>
-                  {item.form.fingerprint?.fingerprintEnabled && (
+                  {item.form.fingerprint?.fingerprintEnabled ? (
                     <div>
                       Fingerprint: {item.form.fingerprint?.fingerprintOs} / {item.form.fingerprint?.fingerprintBrowser} {item.form.fingerprint?.fingerprintBrowserVersion}
                     </div>
-                  )}
+                  ) : <div>No fingerprint</div>}
                   {item.form.system?.timezone?.timezone && (
                     <div>Timezone: {item.form.system?.timezone?.timezone}</div>
                   )}

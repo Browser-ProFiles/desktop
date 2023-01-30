@@ -5,7 +5,7 @@ const AUTO_OPEN_LINKS: { [ key: string ]: string } = {
   botDetection: 'https://bot.sannysoft.com/',
   dnsLeak: 'https://whoer.net/dns-leak-test',
   webrtcLeak: 'https://browserleaks.com/webrtc',
-  fingerprintCom: 'https://fingerprint.com/',
+  fingerprintCom: 'https://fingerprintjs.github.io/fingerprintjs/',
   chromeSecurity: 'chrome://settings/security',
 }
 

@@ -20,6 +20,7 @@ import UserDataDirPlugin from 'puppeteer-extra-plugin-user-data-dir';
 import { decodeHash } from '../helpers/hash';
 import { removeNullBytes } from '../helpers/str';
 import { getAutoOpenLinks } from '../helpers/openLinks';
+import { pageWithCDPSession } from '../helpers/pageWrap';
 
 puppeteer.use(ChromeAppPlugins());
 puppeteer.use(ChromeCsiPlugins());
@@ -54,19 +55,21 @@ export const launchBrowser = async (
     args: [
       ...profileRow.args,
       `--user-data-dir=${browserProfileDir}`,
+      '--disable-site-isolation-xtrials',
+      "--disable-features=IsolateOrigins",
+      '--disable-web-security',
       // '--host-resolver-rules=MAP example.com 1.1.1.1'
     ],
     executablePath: revisionInfo.executablePath,
     timeout: 60 * 100000  // 1m
   };
 
-  console.log('LAUNCH_OPTIONS', LAUNCH_OPTIONS)
   const browser = await puppeteer.launch(LAUNCH_OPTIONS);
-  console.log('LAUNCH OPTIONS AFTER')
 
   const fingerprintInjector = new FingerprintInjector();
 
   const page = await browser.newPage();
+  pageWithCDPSession(page);
   try {
     page.goto('about:blank');
   } catch (e) {
@@ -78,6 +81,7 @@ export const launchBrowser = async (
 
   const proxy = form.proxy;
   const system = form.system;
+
   let fingerprint: any = null;
   if (form.fingerprint?.fingerprintEnabled && form.fingerprint?.fingerprintResult) {
     try {
@@ -85,7 +89,7 @@ export const launchBrowser = async (
     } catch (e) {
       fingerprint = form.fingerprint?.fingerprintResult;
     }
-    fingerprint.headers['accept-language'] = form.system.language.acceptLang ?? 'en';
+    // fingerprint.headers['accept-language'] = 'en';
   }
 
   let proxyUrl: string = '';
@@ -99,6 +103,8 @@ export const launchBrowser = async (
 
   for (const page of pages) {
     if (!page) return;
+
+    pageWithCDPSession(page);
 
     try {
       form.fingerprint.hideWebRtcLeak && await page.evaluateOnNewDocument(
@@ -129,6 +135,8 @@ export const launchBrowser = async (
   browser.on('targetcreated', async (target: any) => {
     const page = await target.page();
     if (!page) return;
+
+    pageWithCDPSession(page);
 
     try {
       form.fingerprint.hideWebRtcLeak && await page.evaluateOnNewDocument(
@@ -163,6 +171,7 @@ export const launchBrowser = async (
 
     links.forEach(async (link) => {
       const page = await browser.newPage();
+      pageWithCDPSession(page);
       page.goto(link);
     });
   } catch (e) {
