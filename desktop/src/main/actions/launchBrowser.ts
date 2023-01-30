@@ -19,6 +19,7 @@ import UserDataDirPlugin from 'puppeteer-extra-plugin-user-data-dir';
 
 import { decodeHash } from '../helpers/hash';
 import { removeNullBytes } from '../helpers/str';
+import { getAutoOpenLinks } from '../helpers/openLinks';
 
 puppeteer.use(ChromeAppPlugins());
 puppeteer.use(ChromeCsiPlugins());
@@ -67,7 +68,7 @@ export const launchBrowser = async (
 
   const page = await browser.newPage();
   try {
-    page.goto('chrome://settings/security');
+    page.goto('about:blank');
   } catch (e) {
     console.log('new page error');
   }
@@ -96,7 +97,6 @@ export const launchBrowser = async (
     }
   }
 
-  console.log('form.fingerprint.hideWebRtcLeak', form.fingerprint.hideWebRtcLeak)
   for (const page of pages) {
     if (!page) return;
 
@@ -155,4 +155,17 @@ export const launchBrowser = async (
       }
     }
   });
+
+  try {
+    const openCheckersKeys: string[] = [];
+    Object.entries(form.checkers).map(([ key, value ]) => value && openCheckersKeys.push(key));
+    const links = getAutoOpenLinks(openCheckersKeys);
+
+    links.forEach(async (link) => {
+      const page = await browser.newPage();
+      page.goto(link);
+    });
+  } catch (e) {
+    console.error('open checkers error', e)
+  }
 };
