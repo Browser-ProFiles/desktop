@@ -21,6 +21,10 @@ export const signIn = (username: string, password: string, token: string) => ins
   token,
 });
 
+export const getCurrentUser = () => instance.get('/user/current');
+
 export const getInstanceList = () => instance.get('/instance/list');
+
+export const getBrowserVersions = () => instance.get('/browser/versions');
 
 export default instance;

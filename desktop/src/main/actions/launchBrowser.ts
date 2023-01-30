@@ -17,6 +17,9 @@ import WindowOuterDimensionsPlugin from 'puppeteer-extra-plugin-stealth/evasions
 import UserDataDirPlugin from 'puppeteer-extra-plugin-user-data-dir';
 // const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 
+import { decodeHash } from '../helpers/hash';
+import { removeNullBytes } from '../helpers/str';
+
 puppeteer.use(ChromeAppPlugins());
 puppeteer.use(ChromeCsiPlugins());
 puppeteer.use(ChromeLoadPluginsPlugins());
@@ -27,8 +30,13 @@ puppeteer.use(SourceUrlPlugin());
 puppeteer.use(WindowOuterDimensionsPlugin());
 // puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
-export const launchBrowser = async (name: string, profileRow: any, form: any) => {
-  const browserRevision = '1056772';
+export const launchBrowser = async (
+  name: string,
+  profileRow: any,
+  form: any,
+  browserHash: string,
+  userHash: string,
+) => {
   const browserDir = `${os.homedir()}/.browserprofiles/browsers`;
   const browserProfileDir = `${os.homedir()}/.browserprofiles/profiles/${slugify(String(name || Date.now()))}`;
 
@@ -37,7 +45,8 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     path: browserDir,
   });
 
-  const revisionInfo = await browserFetcher.download(browserRevision) as any;
+  const revision = removeNullBytes(decodeHash(browserHash, userHash));
+  const revisionInfo = await browserFetcher.revisionInfo(revision) as any;
 
   const LAUNCH_OPTIONS = {
     ...profileRow,
@@ -47,16 +56,21 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
       // '--host-resolver-rules=MAP example.com 1.1.1.1'
     ],
     executablePath: revisionInfo.executablePath,
-    timeout: 240000 // TODO: Change value
+    timeout: 60 * 100000  // 1m
   };
 
   console.log('LAUNCH_OPTIONS', LAUNCH_OPTIONS)
   const browser = await puppeteer.launch(LAUNCH_OPTIONS);
+  console.log('LAUNCH OPTIONS AFTER')
 
   const fingerprintInjector = new FingerprintInjector();
 
-  const page = await browser.newPage()
-  page.goto('https://google.com');
+  const page = await browser.newPage();
+  try {
+    page.goto('chrome://settings/security');
+  } catch (e) {
+    console.log('new page error');
+  }
 
   const pages = await browser.pages();
   await pages[0].close();
@@ -82,6 +96,7 @@ export const launchBrowser = async (name: string, profileRow: any, form: any) =>
     }
   }
 
+  console.log('form.fingerprint.hideWebRtcLeak', form.fingerprint.hideWebRtcLeak)
   for (const page of pages) {
     if (!page) return;
 

@@ -9,13 +9,15 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, Notification, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import dotenv from 'dotenv';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { launchBrowser } from './launchBrowser';
+import { launchBrowser } from './actions/launchBrowser';
+import { downloadBrowser } from './actions/downloadBrowser';
+import { getLocalRevisions } from './actions/localRevisions';
 import { isAxiosError } from 'axios';
 import type { AxiosError } from 'axios';
 import os from 'os';
@@ -47,7 +49,7 @@ ipcMain.on('launch-browser', async (event, content) => {
   try {
     const config = JSON.parse(content.options || {});
     const form = content.form || {};
-    await launchBrowser(content.name, config, form);
+    await launchBrowser(content.name, config, form, content.browserHash, content.userHash);
     event.reply('browser-launch-finish', {
       success: true,
       name: content.name ?? '',
@@ -60,6 +62,43 @@ ipcMain.on('launch-browser', async (event, content) => {
     });
     log.log(JSON.stringify(e))
     console.log('ERR', e)
+  }
+});
+
+ipcMain.on('download-browser', async (event, content) => {
+  try {
+    await downloadBrowser(content.userHash, content.browserHash);
+    event.reply('download-browser-finish', {
+      success: true,
+    });
+    await mainWindow?.reload();
+    new Notification({ title: 'Notification', body: 'Browser downloading successfully finished' }).show()
+    // @ts-ignore
+  } catch (e: AxiosError | Error) {
+    event.reply('download-browser-finish', {
+      success: false,
+      message: isAxiosError(e) ? e.response?.data?.message : e.message,
+    });
+    log.log(JSON.stringify(e))
+    console.log('ERR', e)
+  }
+});
+
+ipcMain.on('get-local-revisions', async (event, content) => {
+  try {
+    const versions = getLocalRevisions(content.userHash ?? '');
+    event.reply('local-revisions-finish', {
+      success: true,
+      versions,
+    });
+    // @ts-ignore
+  } catch (e: AxiosError | Error) {
+    event.reply('local-revisions-finish', {
+      success: false,
+      message: isAxiosError(e) ? e.response?.data?.message : e.message,
+    });
+    log.log(JSON.stringify(e));
+    console.log('ERR', e);
   }
 });
 
