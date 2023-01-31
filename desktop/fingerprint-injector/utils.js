@@ -373,16 +373,31 @@ function overrideBattery(batteryInfo) {
 function overrideIntlAPI(language){
   const innerHandler = {
     construct(target, [locales, options]) {
+      console.log('construct locales', locales)
+      console.log('construct language', language)
       return new target(locales ?? language, options);
     },
     apply(target, _, [locales, options]) {
+      console.log('construct locales', locales)
+      console.log('construct language', language)
       return target(locales ?? language, options);
     }
   };
 
   overridePropertyWithProxy(window, 'Intl', {
     get(target, key){
-      if(key[0].toLowerCase() === key[0]) return target[key];
+      // TODO: (mark) Fixed
+      console.log('intl')
+      console.log('target', target)
+      console.log('key', key)
+
+      if (typeof key === 'symbol') {
+        if (key.toString() === 'Symbol(Symbol.toPrimitive)') {
+          return target[key];
+        }
+      }
+
+      if(key[0]?.toLowerCase() === key[0]) return target[key];
       return new Proxy(
         target[key],
         innerHandler

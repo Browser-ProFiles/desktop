@@ -24,7 +24,6 @@ const requestHandler = async (request, proxy, overrides = {}) => {
         followRedirect: false
     };
     try {
-      console.log('URL', overrides.url || request.url(), (overrides.url || request.url()) === 'https://medaipvx.com/' ? options : 'empty options');
         const response = await got(overrides.url || request.url(), options);
         // Set cookies manually because "set-cookie" doesn't set all cookies (?)
         // Perhaps related to https://github.com/puppeteer/puppeteer/issues/5364
@@ -33,21 +32,11 @@ const requestHandler = async (request, proxy, overrides = {}) => {
             await cookieHandler.setCookies(setCookieHeader);
             response.headers["set-cookie"] = undefined;
         }
-        const config = {
-          status: response.statusCode,
-          headers: {
-            ...response.headers,
-            // TODO: Change?
-            /*"access-control-allow-origin": "*",
-            "access-control-allow-credentials": 'true',
-            "access-control-allow-methods": "*",
-            "accept-language": "en;q=0.8",
-            "sec-fetch-site": "cross-site"*/
-          },
-          body: response.body
-        }
-        // console.log('config', config)
-        await request.respond(config);
+        await request.respond({
+            status: response.statusCode,
+            headers: response.headers,
+            body: response.body
+        });
     } catch (error) {
         await request.abort();
     }

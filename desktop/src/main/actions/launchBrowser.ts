@@ -20,7 +20,6 @@ import UserDataDirPlugin from 'puppeteer-extra-plugin-user-data-dir';
 import { decodeHash } from '../helpers/hash';
 import { removeNullBytes } from '../helpers/str';
 import { getAutoOpenLinks } from '../helpers/openLinks';
-import { pageWithCDPSession } from '../helpers/pageWrap';
 
 puppeteer.use(ChromeAppPlugins());
 puppeteer.use(ChromeCsiPlugins());
@@ -55,9 +54,6 @@ export const launchBrowser = async (
     args: [
       ...profileRow.args,
       `--user-data-dir=${browserProfileDir}`,
-      '--disable-site-isolation-xtrials',
-      "--disable-features=IsolateOrigins",
-      '--disable-web-security',
       // '--host-resolver-rules=MAP example.com 1.1.1.1'
     ],
     executablePath: revisionInfo.executablePath,
@@ -69,7 +65,6 @@ export const launchBrowser = async (
   const fingerprintInjector = new FingerprintInjector();
 
   const page = await browser.newPage();
-  pageWithCDPSession(page);
   try {
     page.goto('about:blank');
   } catch (e) {
@@ -89,7 +84,13 @@ export const launchBrowser = async (
     } catch (e) {
       fingerprint = form.fingerprint?.fingerprintResult;
     }
-    // fingerprint.headers['accept-language'] = 'en';
+
+    const languages = (form.system.language.acceptLang ?? 'en').split(',');
+    fingerprint.headers['accept-language'] = languages.join(',');
+    if (fingerprint.fingerprint.navigator) {
+      fingerprint.fingerprint.navigator.language = languages[0];
+      fingerprint.fingerprint.navigator.languages = languages;
+    }
   }
 
   let proxyUrl: string = '';
@@ -104,8 +105,6 @@ export const launchBrowser = async (
   for (const page of pages) {
     if (!page) return;
 
-    pageWithCDPSession(page);
-
     try {
       form.fingerprint.hideWebRtcLeak && await page.evaluateOnNewDocument(
         `navigator.mediaDevices.getUserMedia = navigator.webkitGetUserMedia = navigator.mozGetUserMedia = navigator.getUserMedia = webkitRTCPeerConnection = RTCPeerConnection = MediaStreamTrack = undefined;`
@@ -115,6 +114,7 @@ export const launchBrowser = async (
     }
 
     Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
+    console.log('proxyUrl', proxyUrl)
     proxy?.proxyEnabled && await useProxy(page, proxyUrl);
 
     try {
@@ -135,8 +135,6 @@ export const launchBrowser = async (
   browser.on('targetcreated', async (target: any) => {
     const page = await target.page();
     if (!page) return;
-
-    pageWithCDPSession(page);
 
     try {
       form.fingerprint.hideWebRtcLeak && await page.evaluateOnNewDocument(
@@ -164,17 +162,44 @@ export const launchBrowser = async (
     }
   });
 
-  try {
-    const openCheckersKeys: string[] = [];
-    Object.entries(form.checkers).map(([ key, value ]) => value && openCheckersKeys.push(key));
-    const links = getAutoOpenLinks(openCheckersKeys);
+  setTimeout(() => {
+    try {
+      const openCheckersKeys: string[] = [];
+      Object.entries(form.checkers).map(([ key, value ]) => value && openCheckersKeys.push(key));
+      const links = getAutoOpenLinks(openCheckersKeys);
 
-    links.forEach(async (link) => {
-      const page = await browser.newPage();
-      pageWithCDPSession(page);
-      page.goto(link);
-    });
-  } catch (e) {
-    console.error('open checkers error', e)
-  }
+      links.forEach(async (link) => {
+        const page = await browser.newPage();
+
+        try {
+          form.fingerprint.hideWebRtcLeak && await page.evaluateOnNewDocument(
+            `navigator.mediaDevices.getUserMedia = navigator.webkitGetUserMedia = navigator.mozGetUserMedia = navigator.getUserMedia = webkitRTCPeerConnection = RTCPeerConnection = MediaStreamTrack = undefined;`
+          );
+        } catch (e) {
+          console.error('webrtc leak hide error (new)');
+        }
+
+        Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
+        proxy?.proxyEnabled && await useProxy(page, proxyUrl);
+
+        try {
+          system.timezone?.timezone && await page.emulateTimezone(system.timezone?.timezone);
+        } catch (e) {
+          console.error('emulate timezone error (new)');
+        }
+
+        if (fingerprint) {
+          try {
+            await fingerprintInjector.attachFingerprintToPuppeteer(page, fingerprint);
+          } catch (e) {
+            console.error('set fingerprint error (new)', e);
+          }
+        }
+
+        page.goto(link);
+      });
+    } catch (e) {
+      console.error('open checkers error', e)
+    }
+  }, 3000);
 };
