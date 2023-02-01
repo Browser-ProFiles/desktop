@@ -24,6 +24,8 @@ const Profiles = () => {
   const [list, setList] = useState<any[]>([]);
 
   const [currentUserHash, setCurrentUserHash] = useState<string>('');
+  const [currentUserMaxProfiles, setCurrentUserMaxProfiles] = useState<number>(0);
+  const [listRealLength, setListRealLength] = useState<number>(0);
 
   const [localRevisions, setLocalRevisions] = useState<Revision[]>([]);
   const [currentRevision, setCurrentRevision] = useState<string | null>(null);
@@ -109,6 +111,7 @@ const Profiles = () => {
       setLoading(true);
       const { data } = await getCurrentUser();
       setCurrentUserHash(data?.hash ?? '');
+      setCurrentUserMaxProfiles(data?.subscription?.maxProfiles);
       // @ts-ignore
     } catch (e: Error | AxiosError) {
       console.error(e);
@@ -161,6 +164,7 @@ const Profiles = () => {
         ...profile,
         form: profile.form ? JSON.parse(profile.form) : {},
       })));
+      setListRealLength(data?.realLength)
       // @ts-ignore
     } catch (e: Error | AxiosError) {
       console.error(e);
@@ -194,7 +198,7 @@ const Profiles = () => {
   return (
     <div className="content-inner">
       <div className="row">
-        <h1 className="title">Profiles</h1>
+        <h1 className="title">Profiles ({listRealLength} / {currentUserMaxProfiles})</h1>
         <Spin delay={300} spinning={launching} />
       </div>
 

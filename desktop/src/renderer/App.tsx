@@ -9,14 +9,14 @@ import './App.css';
 import Login from './pages/Login';
 import Profiles from './pages/Profiles';
 
-const { darkAlgorithm } = theme;
+const { defaultAlgorithm } = theme;
 const { Footer, Content } = Layout;
 
 export default function App() {
   return (
     <ConfigProvider
       theme={{
-        algorithm: darkAlgorithm,
+        algorithm: defaultAlgorithm,
         token: {
           colorPrimary: '#da431a',
           colorLink: '#1aa7da',
