@@ -17,6 +17,15 @@ body {
   box-sizing: inherit;
 }
 
+.default .ant-layout-header {
+  background-color: #fff;
+  color: #000;
+}
+
+.dark {
+  color: #fff;
+}
+
 .row {
   display: flex;
   align-items: center;
@@ -26,13 +35,23 @@ body {
   margin-left: 20px;
 }
 
+.header,
+.header__theme {
+  display: flex;
+  align-items: center;
+}
+
+.header__theme:hover {
+    cursor: pointer;
+}
+
 .center-page,
 .content {
-  min-height: calc(100vh - 66px - 40px);
+  min-height: calc(100vh - 66px - 64px - 40px);
 }
 
 .content-inner {
-  min-height: calc(100vh - 66px);
+  min-height: calc(100vh - 64px - 66px);
 }
 
 .content,

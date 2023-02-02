@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { MemoryRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { Layout, ConfigProvider, theme } from 'antd';
@@ -6,17 +7,31 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'antd/dist/reset.css';
 import './App.css';
 
+import DarkThemeIcon from './components/icons/theme/DarkTheme';
+import DefaultThemeIcon from './components/icons/theme/DefaultTheme';
+
 import Login from './pages/Login';
 import Profiles from './pages/Profiles';
 
-const { defaultAlgorithm } = theme;
-const { Footer, Content } = Layout;
+import { getStorageTheme, setStorageTheme } from './helpers/theme'
+
+const { defaultAlgorithm, darkAlgorithm } = theme;
+const { Header, Footer, Content } = Layout;
 
 export default function App() {
+  const [theme, setTheme] = useState<string>(getStorageTheme());
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'default' ? 'dark' : 'default';
+    setTheme(newTheme);
+    setStorageTheme(newTheme);
+  }
+
   return (
     <ConfigProvider
+      key={theme}
       theme={{
-        algorithm: defaultAlgorithm,
+        algorithm: theme === 'default' ? defaultAlgorithm : darkAlgorithm,
         token: {
           colorPrimary: '#da431a',
           colorLink: '#1aa7da',
@@ -26,7 +41,13 @@ export default function App() {
         },
       }}
     >
-      <Layout>
+      <Layout className={theme}>
+        <Header className='header'>
+          <div className='header__theme' onClick={toggleTheme}>
+            {theme === 'default' && <DarkThemeIcon />}
+            {theme === 'dark' && <DefaultThemeIcon />}
+          </div>
+        </Header>
         <Content>
           <Router>
             <Routes>

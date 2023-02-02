@@ -2,12 +2,13 @@
  * Base webpack config used across other specific configs
  */
 
+// @ts-ignore
 import webpack from 'webpack';
 import TsconfigPathsPlugins from 'tsconfig-paths-webpack-plugin';
 import webpackPaths from './webpack.paths';
+// @ts-ignore
 import dotenv from 'dotenv';
 // @ts-ignore
-import darkTheme from '@ant-design/dark-theme';
 import { dependencies as externals } from '../../release/app/package.json';
 
 const configuration: webpack.Configuration = {
@@ -31,6 +32,13 @@ const configuration: webpack.Configuration = {
           },
         },
       },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        loader: 'file-loader',
+        options: {
+          name: '[path][name].[ext]',
+        },
+      }
     ],
   },
 
