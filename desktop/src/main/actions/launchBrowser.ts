@@ -59,6 +59,7 @@ export const launchBrowser = async (
     executablePath: revisionInfo.executablePath,
     timeout: 60 * 100000  // 1m
   };
+  console.log('LAUNCH_OPTIONS', LAUNCH_OPTIONS)
 
   const browser = await puppeteer.launch(LAUNCH_OPTIONS);
 
