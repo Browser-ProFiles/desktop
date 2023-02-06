@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { List, Button, Spin, Select } from 'antd';
+import { SyncOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import type { AxiosError } from 'axios';
 
@@ -17,6 +19,8 @@ type Revision = {
 
 const Profiles = () => {
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [launching, setLaunching] = useState<boolean>(false);
@@ -41,14 +45,16 @@ const Profiles = () => {
     // @ts-ignore
     window.electron.ipcRenderer.on('browser-launch-finish', (data: any) => {
       setLaunching(false);
-      data.success ? toast.success(`Profile ${data.name ? '"' + data.name + '"' : ''} successfully launched.`) : toast.error(data.message);
+      data.success ?
+        toast.success(`${t('messages.launch.success.part1')} ${data.name ? '"' + data.name + '"' : ''} ${t('messages.launch.success.part2')}`) :
+        toast.error(data.message);
     });
 
     // @ts-ignore
     window.electron.ipcRenderer.on('download-browser-finish', (data: any) => {
       setLoading(false);
       if (data.success) {
-        toast.success(`Specified browser version successfully downloaded.`);
+        toast.success(t('messages.download.success'));
         onGetLocalRevisions();
       } else {
         toast.error(data.message);
@@ -198,7 +204,7 @@ const Profiles = () => {
   return (
     <div className="content-inner">
       <div className="row">
-        <h1 className="title">Profiles ({listRealLength} / {currentUserMaxProfiles})</h1>
+        <h1 className="title">{t('profiles.title')} ({listRealLength} / {currentUserMaxProfiles})</h1>
         <Spin delay={300} spinning={launching} />
       </div>
 
@@ -215,17 +221,15 @@ const Profiles = () => {
         />
 
         {hasCurrentRevision() ? (
-          <Button disabled>Selected</Button>
+          <Button disabled>{t('profiles.selected')}</Button>
         ) : (
           <Button onClick={() => onBrowserDownload()} disabled={loading}>
-            Download
+            {t('profiles.download')}
           </Button>
         )}
-      </div>
 
-      <div className="row">
         <Button className="refresh" disabled={launching} onClick={() => fetchProfiles()}>
-          Refresh
+          <SyncOutlined className="icon" />
         </Button>
       </div>
 
@@ -242,13 +246,14 @@ const Profiles = () => {
                   disabled={launching || loading || !hasCurrentRevision()}
                   onClick={() => onOpenProfile(item.name)}
                 >
-                  Go to folder
+                  {t('profiles.goToFolder')}
                 </Button>
                 <Button
                   disabled={launching || loading || !hasCurrentRevision()}
                   onClick={() => onLaunch(item)}
-                  type="primary">
-                  Launch
+                  type="primary"
+                >
+                  {t('profiles.launch')}
                 </Button>
               </React.Fragment>
             ]}
@@ -259,14 +264,15 @@ const Profiles = () => {
                 <React.Fragment>
                   {item.form.fingerprint?.fingerprintEnabled ? (
                     <div>
-                      Fingerprint: {item.form.fingerprint?.fingerprintOs} / {item.form.fingerprint?.fingerprintBrowser} {item.form.fingerprint?.fingerprintBrowserVersion}
+                      {t('profiles.fingerprint')}:
+                      {item.form.fingerprint?.fingerprintOs} / {item.form.fingerprint?.fingerprintBrowser} {item.form.fingerprint?.fingerprintBrowserVersion}
                     </div>
-                  ) : <div>No fingerprint</div>}
+                  ) : <div>{t('profiles.noFingerprint')}</div>}
                   {item.form.system?.timezone?.timezone && (
-                    <div>Timezone: {item.form.system?.timezone?.timezone}</div>
+                    <div>{t('profiles.timezone')}: {item.form.system?.timezone?.timezone}</div>
                   )}
                   {item.form.proxy?.proxyEnabled && (
-                    <div>Proxy: {item.form.proxy?.proxyHost}:{item.form.proxy?.proxyPort}</div>
+                    <div>{t('profiles.proxy')}: {item.form.proxy?.proxyHost}:{item.form.proxy?.proxyPort}</div>
                   )}
                 </React.Fragment>
               }

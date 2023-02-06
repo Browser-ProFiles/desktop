@@ -33,6 +33,7 @@ export default function App() {
       theme={{
         algorithm: theme === 'default' ? defaultAlgorithm : darkAlgorithm,
         token: {
+          fontFamily: 'Jura',
           colorPrimary: '#da431a',
           colorLink: '#1aa7da',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Input } from 'antd'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 import { signIn } from '../api';
 import { setAuthToken } from '../helpers/auth';
@@ -16,6 +17,8 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { t } = useTranslation()
 
   const onSubmit = (form: Form) => {
     setLoading(true);
@@ -39,11 +42,11 @@ const Login = () => {
     <div className="content">
       <div className="center-page">
         <div className="wrapper">
-          <h1 className="title">Sign In</h1>
+          <h1 className="title">{t("login.title")}</h1>
 
           <p className="note">
-            If you don't have an account, create it on
-            <a href="https://browser-sandbox.com/auth/sign-up"> our website</a>.
+            {t("login.subtitle")}
+            <a href="https://browser-sandbox.com/auth/sign-up"> {t("utils.ourWebsite")}</a>.
           </p>
 
           <Form
@@ -54,32 +57,32 @@ const Login = () => {
             onFinish={onSubmit}
           >
             <Form.Item
-              label="Username"
+              label={t("user.username")}
               name="username"
               trigger="onChange"
               rules={[
-                { required: true, message: 'Please input your username' },
-                { max: 255, message: 'Please shorten your username' },
+                { required: true, message: t("rules.username.required") as string },
+                { max: 255, message: t("rules.username.long") as string },
               ]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item
-              label="Password"
+              label={t("user.password")}
               name="password"
               trigger="onChange"
               rules={[
-                { required: true, message: 'Please input your password' },
-                { max: 255, message: 'Please shorten your password' },
+                { required: true, message: t("rules.password.required") as string },
+                { max: 255, message: t("rules.password.long") as string },
               ]}
             >
               <Input.Password />
             </Form.Item>
 
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button disabled={loading} type="primary" htmlType="submit">
-                Submit
+              <Button className="auth-submit" disabled={loading} type="primary" htmlType="submit">
+                {t("utils.submit")}
               </Button>
             </Form.Item>
           </Form>

@@ -1,3 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'Jura', sans-serif;
+  font-size: 15px;
+}
+
+:root {
+  font-family: 'Jura', sans-serif;
+  font-size: 15px;
+}
+
+.Toastify__toast-body {
+  font-family: 'Jura', sans-serif;
+}
+
 html,
 body,
 h1,
@@ -51,7 +67,7 @@ body {
 }
 
 .content-inner {
-  min-height: calc(100vh - 64px - 66px);
+  min-height: calc(100vh - 64px - 65px);
 }
 
 .content,
@@ -71,6 +87,10 @@ body {
   margin-bottom: 8px;
 }
 
+.auth-submit {
+  margin-top: 8px;
+}
+
 /* page */
 
 .title {
@@ -80,4 +100,15 @@ body {
 
 .buttonLeft {
   margin-right: 10px;
+}
+
+.refresh {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 30px;
+  height: 30px;
+
+  font-size: 16px;
 }
