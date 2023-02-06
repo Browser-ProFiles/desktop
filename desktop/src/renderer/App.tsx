@@ -64,7 +64,7 @@ export default function App() {
           <SwitchLang className="footer__switch-lang" />
         </Footer>
 
-        <ToastContainer />
+        <ToastContainer limit={1} />
       </Layout>
     </ConfigProvider>
   );
