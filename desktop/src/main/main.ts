@@ -33,8 +33,6 @@ class AppUpdater {
 
 dotenv.config();
 
-console.log('env', process.env.REACT_APP_API_BASE_URL)
-
 log.transports.file.level = 'info';
 
 let mainWindow: BrowserWindow | null = null;
@@ -142,6 +140,8 @@ const createWindow = async () => {
     show: false,
     width: 1200,
     height: 800,
+    minWidth: 450,
+    minHeight: 300,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       webSecurity: false,

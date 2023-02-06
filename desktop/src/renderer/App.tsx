@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import Profiles from './pages/Profiles';
 
 import { getStorageTheme, setStorageTheme } from './helpers/theme'
+import SwitchLang from "./components/utils/SwitchLang";
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 const { Header, Footer, Content } = Layout;
@@ -58,7 +59,10 @@ export default function App() {
             </Routes>
           </Router>
         </Content>
-        <Footer>© {new Date().getFullYear()} Browser ProFiles</Footer>
+        <Footer className="footer">
+          <div className="footer__copyright">© {new Date().getFullYear()} Browser ProFiles</div>
+          <SwitchLang className="footer__switch-lang" />
+        </Footer>
 
         <ToastContainer />
       </Layout>

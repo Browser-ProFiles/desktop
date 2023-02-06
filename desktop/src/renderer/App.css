@@ -14,6 +14,10 @@ body {
   font-family: 'Jura', sans-serif;
 }
 
+.ant-layout {
+  min-height: 100vh;
+}
+
 html,
 body,
 h1,
@@ -67,7 +71,7 @@ body {
 }
 
 .content-inner {
-  min-height: calc(100vh - 64px - 65px);
+  min-height: calc(100vh - 64px - 55px);
 }
 
 .content,
@@ -111,4 +115,17 @@ body {
   height: 30px;
 
   font-size: 16px;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 55px;
+}
+
+.ant-select.switch-lang {
+  width: 150px;
 }
