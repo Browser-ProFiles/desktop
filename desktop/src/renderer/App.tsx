@@ -55,7 +55,7 @@ export default function App() {
             <Routes>
               <Route path="/profiles" element={<Profiles />} />
               <Route path="/auth/login" element={<Login />} />
-              <Route path="*" element={<Navigate to="/profiles" replace />} />
+              <Route path="*" element={<Navigate to="/auth/login" replace />} />
             </Routes>
           </Router>
         </Content>
