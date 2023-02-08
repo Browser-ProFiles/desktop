@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Select } from 'antd';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import instance from '../../api';
 
 import { getStorageLang, setStorageLang } from '../../helpers/lang';
 
@@ -26,8 +26,8 @@ const SwitchLang: React.FC<Props> = ({ className }) => {
 
   useEffect(() => {
     i18n.changeLanguage(lang);
-    axios.defaults.params = {
-      ...axios.defaults.params ?? {},
+    instance.defaults.params = {
+      ...instance.defaults.params ?? {},
       lang,
     };
   }, []);
@@ -36,8 +36,8 @@ const SwitchLang: React.FC<Props> = ({ className }) => {
     setLang(lang);
     setStorageLang(lang);
     i18n.changeLanguage(lang);
-    axios.defaults.params = {
-      ...axios.defaults.params ?? {},
+    instance.defaults.params = {
+      ...instance.defaults.params ?? {},
       lang,
     };
   }

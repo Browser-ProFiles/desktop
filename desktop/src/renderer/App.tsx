@@ -55,7 +55,7 @@ export default function App() {
             <Routes>
               <Route path="/profiles" element={<Profiles />} />
               <Route path="/auth/login" element={<Login />} />
-              <Route path="*" element={<Navigate to="/auth/login" replace />} />
+              <Route path="*" element={<Navigate to="/profiles" replace />} />
             </Routes>
           </Router>
         </Content>
@@ -64,7 +64,7 @@ export default function App() {
           <SwitchLang className="footer__switch-lang" />
         </Footer>
 
-        <ToastContainer limit={1} />
+        <ToastContainer />
       </Layout>
     </ConfigProvider>
   );
