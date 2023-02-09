@@ -4,9 +4,8 @@
   "description": "Create you own fingerprints & browser profiles",
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "BrowserProFiles",
+    "email": "browserprofiles@hotmail.com"
   },
   "main": "./dist/main/main.js",
   "scripts": {
@@ -18,8 +17,8 @@
   "dependencies": {
     "clone-deep": "^4.0.1",
     "merge-deep": "^3.0.3",
-    "puppeteer-extra-plugin-stealth": "file:../../puppeteer-extra-plugin-stealth",
-    "fingerprint-injector": "file:../../fingerprint-injector",
-    "puppeteer-page-proxy": "file:../../puppeteer-page-proxy"
+    "puppeteer-extra-plugin-stealth": "file:../../libs/evasions",
+    "fingerprint-injector": "file:../../libs/injector",
+    "puppeteer-page-proxy": "file:../../libs/proxy"
   }
 }

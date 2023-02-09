@@ -83,7 +83,7 @@ class StealthPlugin extends PuppeteerExtraPlugin {
       'chrome.app',
       'chrome.csi',
       'chrome.loadTimes',
-      // 'chrome.runtime',
+      'chrome.runtime',
       'defaultArgs',
       // 'iframe.contentWindow',
       // 'media.codecs', TODO: Fix proxy toString
@@ -93,11 +93,12 @@ class StealthPlugin extends PuppeteerExtraPlugin {
       'navigator.plugins',
       'navigator.webdriver',
       'sourceurl',
-      'hairline-feature',
+      'hairline.feature',
       // 'user-agent-override',
       // 'webgl.vendor',
       'window.outerdimensions'
     ])
+    console.log('availableEvasions', availableEvasions)
     return {
       availableEvasions,
       // Enable all available evasions by default

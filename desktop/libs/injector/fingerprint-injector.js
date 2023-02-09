@@ -5,10 +5,7 @@ const tslib_1 = require("tslib");
 const path_1 = tslib_1.__importDefault(require("path"));
 const fs_1 = require("fs");
 const constants_1 = require("./constants");
-/**
- * Fingerprint injector class.
- * @class
- */
+
 class FingerprintInjector {
     constructor() {
         Object.defineProperty(this, "utilsJs", {
@@ -19,29 +16,7 @@ class FingerprintInjector {
         });
     }
     /**
-     * Adds init script to the browser context, so the fingerprint is changed before every document creation.
-     * DISCLAIMER: Since Playwright does not support changing viewport and `user-agent` after the context is created,
-     * you have to set it manually when the context is created. Check the Playwright usage example for more details.
-     * @param browserContext Playwright browser context to be injected with the fingerprint.
-     * @param fingerprint Browser fingerprint from [`fingerprint-generator`](https://github.com/apify/fingerprint-generator).
-     */
-    async attachFingerprintToPlaywright(browserContext, browserFingerprintWithHeaders) {
-        const { fingerprint, headers } = browserFingerprintWithHeaders;
-        const enhancedFingerprint = this._enhanceFingerprint(fingerprint);
-        const content = this.getInjectableFingerprintFunction(enhancedFingerprint);
-        // Override the language properly
-        await browserContext.setExtraHTTPHeaders({
-            'accept-language': headers['accept-language'],
-        });
-        await browserContext.on('page', (page) => {
-            page.emulateMedia({ colorScheme: 'dark' })
-                .catch(() => { });
-        });
-        await browserContext.addInitScript({
-            content,
-        });
-    }
-    /**
+     * TODO: MAIN ENTRY
      * Adds script that is evaluated before every document creation.
      * Sets User-Agent and viewport using native puppeteer interface
      * @param page Puppeteer `Page` object to be injected with the fingerprint.
@@ -52,6 +27,7 @@ class FingerprintInjector {
         const enhancedFingerprint = this._enhanceFingerprint(fingerprint);
         const { screen, userAgent } = enhancedFingerprint;
         await page.setUserAgent(userAgent);
+
         // TODO (MARK): Commented
         /*await (await page.target().createCDPSession()).send('Page.setDeviceMetricsOverride', {
             screenHeight: screen.height,
@@ -62,6 +38,7 @@ class FingerprintInjector {
             // screenOrientation: screen.height > screen.width ? { angle: 0, type: 'portraitPrimary' } : { angle: 90, type: 'landscapePrimary' },
             deviceScaleFactor: screen.devicePixelRatio,
         });*/
+
         // Override the language properly
         await page.setExtraHTTPHeaders({
             'accept-language': headers['accept-language'],
@@ -69,7 +46,14 @@ class FingerprintInjector {
         await page.emulateMediaFeatures([
             { name: 'prefers-color-scheme', value: 'dark' },
         ]);
-        await page.evaluateOnNewDocument(this.getInjectableFingerprintFunction(enhancedFingerprint));
+
+        const readyScript = `
+          ${this.getInjectableFingerprintFunction(enhancedFingerprint)}
+          ${this.getInjectableWorkerScript(enhancedFingerprint)}
+        `;
+
+        console.log('readyScript', readyScript)
+        await page.evaluateOnNewDocument(readyScript);
     }
     /**
      * Gets the override script that should be evaluated in the browser.
@@ -79,7 +63,57 @@ class FingerprintInjector {
         const enhancedFingerprint = this._enhanceFingerprint(fingerprint);
         return this.getInjectableFingerprintFunction(enhancedFingerprint);
     }
-    /**
+
+  /**
+   *
+   * @param browserFingerprintWithHeaders {BrowserFingerprintWithHeaders}
+   * @experimental
+   * @returns
+   */
+  getInjectableWorkerScript(browserFingerprintWithHeaders) {
+    const { fingerprint } = browserFingerprintWithHeaders;
+    const enhancedFingerprint = this._enhanceFingerprint(fingerprint);
+
+    return this._getInjectableNavigatorFingerprintFunction(enhancedFingerprint);
+  }
+
+  /**
+   * Gets the override script that should be evaluated in the browser.
+   * TODO: Copied from draft. Should work
+   * @see https://github.com/apify/fingerprint-suite/pull/105/files
+   * @experimental
+   */
+  _getInjectableNavigatorFingerprintFunction(fingerprint) {
+    function inject() {
+      const {
+        battery,
+        navigator: {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          extraProperties,
+          userAgentData,
+          webdriver,
+          ...navigatorProps
+        },
+        videoCard,
+        // @ts-expect-error internal browser code
+      } = fpWorker;
+
+      if (userAgentData) {
+        overrideUserAgentData(userAgentData);
+      }
+
+      overrideInstancePrototype(navigator, navigatorProps);
+
+      overrideWebGl(videoCard);
+      overrideBattery(battery);
+    }
+
+    const mainFunctionString = inject.toString();
+
+    return `(()=>{${this.utilsJs}; const fpWorker=${JSON.stringify(fingerprint)}; (${mainFunctionString})()})()`;
+  }
+
+  /**
      * Create injection function string.
      * @param fingerprint Enhanced fingerprint.
      * @returns Script overriding browser fingerprint.
@@ -136,6 +170,7 @@ class FingerprintInjector {
         const mainFunctionString = inject.toString();
         return `(()=>{${this.utilsJs}; const fp=${JSON.stringify(fingerprint)}; (${mainFunctionString})()})()`;
     }
+
     _enhanceFingerprint(fingerprint) {
         const { navigator, ...rest } = fingerprint;
         return {
@@ -145,11 +180,13 @@ class FingerprintInjector {
             historyLength: this._randomInRange(2, 6),
         };
     }
+
     _loadUtils() {
         const utilsJs = (0, fs_1.readFileSync)(path_1.default.join(__dirname, constants_1.UTILS_FILE_NAME));
         // we need to add the new lines because of typescript initial a final comment causing issues.
         return `\n${utilsJs}\n`;
     }
+
     _randomInRange(min, max) {
         return Math.floor(Math.random() * (max - min) + min);
     }

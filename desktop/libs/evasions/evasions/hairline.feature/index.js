@@ -16,15 +16,17 @@ class Plugin extends PuppeteerExtraPlugin {
   }
 
   get name() {
-    return 'stealth/evasions/iframe.contentWindow'
-  }
-
-  get requirements() {
-    // Make sure `chrome.runtime` has ran, we use data defined by it (e.g. `window.chrome`)
-    return new Set(['runLast'])
+    return 'stealth/evasions/hairline.feature'
   }
 
   async onPageCreated(page) {
+    console.log('HAIRLINE FEATURE')
+    console.log('HAIRLINE FEATURE')
+    console.log('HAIRLINE FEATURE')
+    console.log('HAIRLINE FEATURE')
+    console.log('HAIRLINE FEATURE')
+    console.log('HAIRLINE FEATURE')
+    console.log('HAIRLINE FEATURE')
     await withUtils(page).evaluateOnNewDocument((utils, opts) => {
       try {
         const elementDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight');
