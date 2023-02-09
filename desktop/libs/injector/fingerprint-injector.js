@@ -47,12 +47,12 @@ class FingerprintInjector {
             { name: 'prefers-color-scheme', value: 'dark' },
         ]);
 
+        // TODO: Finish
         const readyScript = `
           ${this.getInjectableFingerprintFunction(enhancedFingerprint)}
-          ${this.getInjectableWorkerScript(enhancedFingerprint)}
         `;
+        /*this.getInjectableWorkerScript(enhancedFingerprint)*/
 
-        console.log('readyScript', readyScript)
         await page.evaluateOnNewDocument(readyScript);
     }
     /**
@@ -65,13 +65,10 @@ class FingerprintInjector {
     }
 
   /**
-   *
-   * @param browserFingerprintWithHeaders {BrowserFingerprintWithHeaders}
    * @experimental
    * @returns
    */
-  getInjectableWorkerScript(browserFingerprintWithHeaders) {
-    const { fingerprint } = browserFingerprintWithHeaders;
+  getInjectableWorkerScript(fingerprint) {
     const enhancedFingerprint = this._enhanceFingerprint(fingerprint);
 
     return this._getInjectableNavigatorFingerprintFunction(enhancedFingerprint);
@@ -158,6 +155,10 @@ class FingerprintInjector {
             if (window.navigator.webdriver) {
                 navigatorProps.webdriver = false;
             }
+            // TODO: Fix
+            navigatorProps.hardwareConcurrency = window.navigator.hardwareConcurrency;
+            navigatorProps.deviceMemory = window.navigator.deviceMemory;
+
             overrideInstancePrototype(window.navigator, navigatorProps);
             // overrideInstancePrototype(window.screen, newScreen);
             // overrideWindowDimensionsProps(windowScreenProps);
