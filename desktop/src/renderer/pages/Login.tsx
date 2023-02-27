@@ -25,7 +25,7 @@ const Login = () => {
     signIn(form.username, form.password, token || '')
       .then(({ data }) => {
         setAuthToken(data.token);
-        toast.success('Successfully logged in');
+        toast.success(t('messages.auth.success'));
         navigate('/profiles');
       })
       .catch((e) => {

@@ -37,13 +37,16 @@ i18n
             proxy: 'Proxy',
           },
           messages: {
+            auth: {
+              success: 'Successful authorization',
+            },
             download: {
-              success: 'Specified browser version successfully downloaded.'
+              success: 'Specified browser version successfully downloaded'
             },
             launch: {
               success: {
                 part1: 'Profile',
-                part2: 'successfully launched.'
+                part2: 'successfully launched'
               }
             }
           },
@@ -85,13 +88,16 @@ i18n
             proxy: 'Прокси',
           },
           messages: {
+            auth: {
+              success: 'Успешная авторизация',
+            },
             download: {
-              success: 'Указанная версия браузера успешно загружена.'
+              success: 'Указанная версия браузера успешно загружена'
             },
             launch: {
               success: {
                 part1: 'Профиль',
-                part2: 'успешно запущен.'
+                part2: 'успешно запущен'
               }
             }
           },
