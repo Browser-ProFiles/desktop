@@ -102,6 +102,7 @@ export const launchBrowser = async (
       proxyUrl = `${proxy.proxyType}://${proxy.proxyHost}:${proxy.proxyPort}`;
     }
   }
+  console.log('proxyUrl', proxyUrl)
 
   for (const page of pages) {
     if (!page) return;
@@ -115,7 +116,6 @@ export const launchBrowser = async (
     }
 
     Object.defineProperty(page.constructor, 'name', { get(): any { return 'CDPPage' }, });
-    console.log('proxyUrl', proxyUrl)
     proxy?.proxyEnabled && await useProxy(page, proxyUrl);
 
     try {
