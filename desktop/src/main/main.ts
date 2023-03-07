@@ -22,6 +22,7 @@ import { isAxiosError } from 'axios';
 import type { AxiosError } from 'axios';
 import os from 'os';
 import slugify from 'slugify';
+import {throttle} from "./helpers/throttle";
 
 class AppUpdater {
   constructor() {
@@ -65,12 +66,28 @@ ipcMain.on('launch-browser', async (event, content) => {
 
 ipcMain.on('download-browser', async (event, content) => {
   try {
-    await downloadBrowser(content.userHash, content.browserHash);
+    const sendProgress = throttle((current: number, fullSize: number) => {
+      event.reply('download-browser-progress', {
+        current,
+        fullSize,
+      });
+    }, 500);
+
+    await downloadBrowser(content.userHash, content.browserHash, (current: number, fullSize: number) => {
+      // @ts-ignore
+      sendProgress(current, fullSize);
+    });
+
     event.reply('download-browser-finish', {
       success: true,
     });
     await mainWindow?.reload();
-    new Notification({ title: 'Notification', body: 'Browser downloading successfully finished' }).show()
+    new Notification({
+      title: content.lang === 'en' ? 'Browser downloading' : 'Загрузка браузера',
+      body: content.lang === 'en' ?
+        'Chromium Browser successfully installed on your computer' :
+        'Браузер Chromium успешно установлен на вашем компьютере',
+    }).show()
     // @ts-ignore
   } catch (e: AxiosError | Error) {
     event.reply('download-browser-finish', {

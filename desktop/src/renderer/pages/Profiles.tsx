@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, Fragment} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { List, Button, Spin, Select } from 'antd';
+import { List, Button, Spin, Select, Progress } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -20,8 +20,12 @@ type Revision = {
 const Profiles = () => {
   const navigate = useNavigate();
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
+  const [downloadedSize, setDownloadedSize] = useState<number | string>(0);
+  const [fullSize, setFullSize] = useState<number | string>(0);
+
+  const [downloading, setDownloading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [launching, setLaunching] = useState<boolean>(false);
 
@@ -51,6 +55,14 @@ const Profiles = () => {
     });
 
     // @ts-ignore
+    window.electron.ipcRenderer.on('download-browser-progress', (data: any) => {
+      // @ts-ignore
+      setDownloadedSize((Number(data.current) / 1000000).toFixed(1));
+      // @ts-ignore
+      setFullSize((Number(data.fullSize) / 1000000).toFixed(1));
+    });
+
+    // @ts-ignore
     window.electron.ipcRenderer.on('download-browser-finish', (data: any) => {
       if (data.success) {
         toast.success(t('messages.download.success'));
@@ -58,7 +70,7 @@ const Profiles = () => {
       } else {
         toast.error(data.message);
       }
-      setLoading(false);
+      setDownloading(false);
     });
 
     // @ts-ignore
@@ -91,12 +103,13 @@ const Profiles = () => {
     if (!currentUserHash) {
       return;
     }
-    setLoading(true);
+    setDownloading(true);
 
     // @ts-ignore
     window.electron.ipcRenderer.sendMessage('download-browser', {
       userHash: currentUserHash,
       browserHash: currentRevision,
+      lang: i18n.language,
     });
   }
 
@@ -203,6 +216,21 @@ const Profiles = () => {
 
   return (
     <div className="content-inner">
+      {downloading && (
+        <Fragment>
+          <div className="overlay">
+            <div className="download-modal">
+              <Progress
+                type="circle"
+                percent={parseInt(String(Number(downloadedSize) / Number(fullSize) * 100))}
+                strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
+              />
+              <div className="download-modal-text">{downloadedSize} / {fullSize} MB</div>
+            </div>
+          </div>
+        </Fragment>
+      )}
+
       <div className="row">
         <h1 className="title">{t('profiles.title')} ({listRealLength} / {currentUserMaxProfiles})</h1>
         <Spin delay={300} spinning={launching} />
@@ -217,18 +245,18 @@ const Profiles = () => {
             label: `${item.name} ${item.version}`,
             value: item.hash,
           }))}
-          disabled={loading}
+          disabled={loading || downloading}
         />
 
         {hasCurrentRevision() ? (
           <Button disabled>{t('profiles.selected')}</Button>
         ) : (
-          <Button onClick={() => onBrowserDownload()} disabled={loading}>
+          <Button onClick={() => onBrowserDownload()} disabled={loading || downloading}>
             {t('profiles.download')}
           </Button>
         )}
 
-        <Button className="refresh" disabled={launching} onClick={() => fetchProfiles()}>
+        <Button className="refresh" disabled={launching || downloading} onClick={() => fetchProfiles()}>
           <SyncOutlined className="icon" />
         </Button>
       </div>
@@ -243,13 +271,13 @@ const Profiles = () => {
               <React.Fragment>
                 <Button
                   className="buttonLeft"
-                  disabled={launching || loading || !hasCurrentRevision()}
+                  disabled={launching || loading || downloading || !hasCurrentRevision()}
                   onClick={() => onOpenProfile(item.name)}
                 >
                   {t('profiles.goToFolder')}
                 </Button>
                 <Button
-                  disabled={launching || loading || !hasCurrentRevision()}
+                  disabled={launching || loading || downloading || !hasCurrentRevision()}
                   onClick={() => onLaunch(item)}
                   type="primary"
                 >

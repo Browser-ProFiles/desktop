@@ -7,6 +7,7 @@ import { removeNullBytes } from '../helpers/str';
 export const downloadBrowser = async (
   userHash: string,
   browserHash: string,
+  progressCallback = (x: number, y: number) => {},
 ) => {
   const browserDir = `${os.homedir()}/.browserprofiles/browsers`;
 
@@ -19,5 +20,5 @@ export const downloadBrowser = async (
   if (!await browserFetcher.canDownload(revision)) {
     throw new Error('Can\'t download browser.');
   }
-  return await browserFetcher.download(revision) as any;
+  return await browserFetcher.download(revision, progressCallback) as any;
 };
