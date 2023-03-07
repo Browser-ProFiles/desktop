@@ -44,21 +44,21 @@ const Profiles = () => {
 
     // @ts-ignore
     window.electron.ipcRenderer.on('browser-launch-finish', (data: any) => {
-      setLaunching(false);
       data.success ?
         toast.success(`${t('messages.launch.success.part1')} ${data.name ? '"' + data.name + '"' : ''} ${t('messages.launch.success.part2')}`) :
         toast.error(data.message);
+      setLaunching(false);
     });
 
     // @ts-ignore
     window.electron.ipcRenderer.on('download-browser-finish', (data: any) => {
-      setLoading(false);
       if (data.success) {
         toast.success(t('messages.download.success'));
         onGetLocalRevisions();
       } else {
         toast.error(data.message);
       }
+      setLoading(false);
     });
 
     // @ts-ignore
