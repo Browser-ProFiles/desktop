@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MemoryRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { Layout, ConfigProvider, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { Layout, ConfigProvider, Modal, theme } from 'antd';
+import { ExclamationOutlined } from '@ant-design/icons';
 
 import 'react-toastify/dist/ReactToastify.css';
 import 'antd/dist/reset.css';
 import './App.css';
+
+import { getAppVersion } from './api';
 
 import DarkThemeIcon from './components/icons/theme/DarkTheme';
 import DefaultThemeIcon from './components/icons/theme/DefaultTheme';
@@ -19,14 +23,59 @@ import SwitchLang from "./components/utils/SwitchLang";
 const { defaultAlgorithm, darkAlgorithm } = theme;
 const { Header, Footer, Content } = Layout;
 
+const APP_CURRENT_VERSION = '1.0.0';
+
 export default function App() {
   const [theme, setTheme] = useState<string>(getStorageTheme());
+  const [latestVersion, setLatestVersion] = useState<string>('');
+  const [newVersionAvailable, setNewVersionAvailable] = useState<boolean>(false);
+
+  const { t } = useTranslation();
 
   const toggleTheme = () => {
     const newTheme = theme === 'default' ? 'dark' : 'default';
     setTheme(newTheme);
     setStorageTheme(newTheme);
   }
+
+  const openUpdateModal = () => {
+    Modal.info({
+      title: t('modals.newVersion.title', { version: latestVersion }),
+      content: (
+        <div>
+          <p>{t('modals.newVersion.description')}</p>
+        </div>
+      ),
+      okText: t('utils.notShowAgain'),
+      onOk: () => localStorage.setItem('hidUpdate', latestVersion)
+    });
+  }
+
+  useEffect(() => {
+    const fetchAppVersion = async () => {
+      try {
+        const { data } = await getAppVersion();
+
+        setLatestVersion(data.latestVersion);
+        if (
+          Number(data.latestVersion.split('.').join('')) >
+          Number(APP_CURRENT_VERSION.split('.').join(''))
+        ) {
+          setNewVersionAvailable(true);
+
+          if (localStorage.getItem('hidUpdate') === data.latestVersion) {
+            return;
+          }
+
+          openUpdateModal();
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    fetchAppVersion();
+  }, []);
 
   return (
     <ConfigProvider
@@ -60,7 +109,14 @@ export default function App() {
           </Router>
         </Content>
         <Footer className="footer">
-          <div className="footer__copyright">© {new Date().getFullYear()} Browser ProFiles</div>
+          <div className="footer__left">
+            <div className="footer__copyright">© {new Date().getFullYear()} Browser ProFiles</div>
+            <div className="footer__version">{APP_CURRENT_VERSION} {newVersionAvailable && (
+              <div onClick={() => openUpdateModal()} className="footer__version-new">
+                <ExclamationOutlined />
+              </div>
+            )}</div>
+          </div>
           <SwitchLang className="footer__switch-lang" />
         </Footer>
 

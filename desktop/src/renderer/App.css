@@ -126,6 +126,31 @@ body {
   height: 55px;
 }
 
+.footer__left,
+.footer__version {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.footer__version-new {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 22px;
+  height: 22px;
+
+  margin-right: 5px;
+
+  border-radius: 30px;
+  border: 1px solid #000;
+}
+
+.footer__version-new:hover {
+  cursor: pointer;
+}
+
 .ant-select.switch-lang {
   width: 150px;
 }

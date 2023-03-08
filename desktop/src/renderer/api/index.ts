@@ -27,4 +27,6 @@ export const getInstanceList = () => instance.get('/instance/list');
 
 export const getBrowserVersions = () => instance.get('/browser/versions');
 
+export const getAppVersion = () => instance.get('/app/version');
+
 export default instance;

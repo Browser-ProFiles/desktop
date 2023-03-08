@@ -7,6 +7,12 @@ i18n
     resources: {
       en: {
         translation: {
+          modals: {
+            newVersion: {
+              title: 'New version available ({{version}})',
+              description: 'Please update the application on our website.',
+            }
+          },
           login: {
             title: 'Sign In',
             subtitle: 'If you don\'t have an account, create it on'
@@ -52,12 +58,19 @@ i18n
           },
           utils: {
             ourWebsite: 'website',
-            submit: 'Submit'
+            submit: 'Submit',
+            notShowAgain: 'Not show again'
           }
         }
       },
       ru: {
         translation: {
+          modals: {
+            newVersion: {
+              title: 'Доступно обновление приложения ({{version}})',
+              description: 'Пожалуйста, загрузите новую версию с нашего сайта.',
+            }
+          },
           login: {
             title: 'Войти',
             subtitle: 'Если у вас нет аккаунта, зарегистрируйтесь'
@@ -103,7 +116,8 @@ i18n
           },
           utils: {
             ourWebsite: 'на сайте',
-            submit: 'Войти'
+            submit: 'Войти',
+            notShowAgain: 'Не показывать снова'
           }
         }
       }
