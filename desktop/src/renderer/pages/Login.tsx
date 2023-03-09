@@ -46,7 +46,7 @@ const Login = () => {
 
           <p className="note">
             {t("login.subtitle")}
-            <a href="https://browser-sandbox.com/auth/sign-up"> {t("utils.ourWebsite")}</a>.
+            <a target="_blank" href="https://lk.browser-profiles.com/auth/sign-up"> {t("utils.ourWebsite")}</a>.
           </p>
 
           <Form
