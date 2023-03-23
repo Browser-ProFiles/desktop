@@ -10,7 +10,7 @@
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
     "package:mwlx64": "npx electron-builder -mwl --x64",
-    "package:mwl": "npx electron-builder -mwl",
+    "package:mwlarm": "npx electron-builder -mwl --arm",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && node node_modules/puppeteer/install.js && npm run start:renderer",
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
