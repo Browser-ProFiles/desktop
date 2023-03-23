@@ -32,15 +32,15 @@
 </ol>
 </p>
 
+    cd desktop
+    npm i
+    npm start
+
 <p align="center">
     Path to profile launch file:
 
     desktop/src/main/actions/launchBrowser.ts
 </p>
-
-    cd desktop
-    npm i
-    npm start
 
 <p align="center"><b>Build for x86 arch</b></p>
 
